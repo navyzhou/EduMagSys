@@ -69,7 +69,7 @@ public class LoginController extends BaseController {
 			AdminInfo adminInfo = adminInfoBiz.adminLogin(admin);
 			if (adminInfo != null) {
 				WebSocketServer wss = WebSocketServer.getWebSocket(String.valueOf(adminInfo.getAid()));
-				if (wss != null) {
+				if (wss != null) {  // 如果已经登录，则发送挤退信息
 					try {
 						wss.sendMessage("101");
 					} catch (IOException e) {
