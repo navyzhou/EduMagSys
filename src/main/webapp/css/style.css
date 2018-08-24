@@ -1,0 +1,87 @@
+@CHARSET "UTF-8";
+.myipt {
+	width: 160px;
+	height: 20px;
+	border: 1px solid #95B8E7;
+	border-radius: 2px;
+}
+
+.myselect {
+	width: 120px;
+	height: 24px;
+	border: 1px solid #95B8E7;
+	border-radius: 2px;
+}
+
+.mylabel {
+	padding-left: 10px;
+}
+
+#stuInfo_form>ul{
+	list-style-type: none;
+}
+
+#stuInfo_form>ul>li{
+	margin : 10px;
+}
+
+#stuInfo_form>ul>li>label{
+	display:inline-block;
+	width:100px;
+	text-align: right;
+}
+
+#stuInfo_form>ul>li>input{
+	width:300px;
+	height:24px;
+}
+
+#stuInfo_form>ul>li>select{
+	width:300px;
+	height:28px;
+}
+
+#stuInfo_pic_view {
+	margin-top: 20px;
+}
+
+#stuInfo_pic_view>.stuInfo_pic_view1{
+	border:2px dashed #ccc;
+	width: 200px;
+	height: 200px;
+	float:left;
+	margin-left:60px;
+	background: url("../images/user.png") no-repeat center center;
+}
+
+#stuInfo_pic_view>.stuInfo_pic_view2{
+	border:2px dashed #ccc;
+	width: 395px;
+	height: 200px;
+	float:left;
+	margin-left:40px;
+	background: url("../images/card1.png") no-repeat center center;
+}
+
+#stuInfo_pic_view>.stuInfo_pic_view3{
+	border:2px dashed #ccc;
+	width: 395px;
+	height: 200px;
+	float:left;
+	margin-left:40px;
+	background: url("../images/card2.png") no-repeat center center;
+}
+
+.myerr {
+	border : 1px solid red;
+}
+
+#stuInfo_form>ul>li>span {
+	 color: red;
+	 padding-let:20px;
+}
+
+.mylbl{
+	padding-right: 60px;
+	line-height: 30px;
+}

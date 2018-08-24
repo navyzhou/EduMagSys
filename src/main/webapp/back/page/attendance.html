@@ -1,0 +1,175 @@
+<table id="attendance_data" data-options="fit:true"></table>  
+
+<div id="attendance_search">
+	<label class="mylabel">班级方向：</label>
+	<select id="attendance_search_train" class="myselect" onchange="changeAttendanceClassInfo(this.value)">
+		<option value="">--请选择--</option>
+	</select>
+	<label class="mylabel">考勤班级：</label>
+	<select id="attendance_search_cid" class="myselect">
+	</select>
+	<label class="mylabel">考勤日期：</label>
+	<input type="text" id="attendance_search_adate" class="easyui-datebox"/>
+	
+	<label class="mylabel">考勤时段：</label>
+	<select id="attendance_search_timeslot" class="myselect">
+		<option value="1">上午</option>
+		<option value="2">下午</option>
+		<option value="3">晚上</option>
+	</select>
+	&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:searchAttendanceStuInfo()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</a>&nbsp;&nbsp;&nbsp;&nbsp;
+	<a href="javascript:addAttendanceStuInfo()" class="easyui-linkbutton" data-options="iconCls:'icon-save'">提交</a> 
+	<label class="mylabel" id="attendance_info"></label>
+</div>
+
+<script>
+var attendance_class_info;
+
+var date = new Date();
+var dataStr = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+var contentStr = "";
+
+$(function(){
+	$("#attendance_search_adate").datebox();
+	$("#attendance_search_adate").datebox('setValue', dataStr);
+	
+	var time = date.getHours();
+
+	if (time < 13) {
+		$("#attendance_search_timeslot").val(1);
+	} else if (time < 18) {
+		$("#attendance_search_timeslot").val(2);
+	} else {
+		$("#attendance_search_timeslot").val(3);
+	}
+	
+	$.getJSON("../attendance", {op:"findByTrainAndClass"}, function(data){
+		attendance_class_info = data.classInfos;
+		var str ="";
+		$.each(data.trains, function(index, item){
+			str += "<option value='" + item.tid + "'>" + item.tname + "</option>";		
+		});
+		$("#attendance_search_train").append($(str));
+	});
+});
+
+function changeAttendanceClassInfo(val) {
+	var str ="";
+	$.each(attendance_class_info, function(index, item){
+		if (item.tid == val) {
+			str += "<option value='" + item.cid + "'>" + item.cname + "</option>";	
+		}
+	});
+	$("#attendance_search_cid").html("").append($(str));
+}
+
+var attendance_obj = $('#attendance_data').datagrid({    
+    fitColumns:true,
+    striped:true,
+    nowrap:true,
+    loadMsg:'数据加载中...',
+    singleSelect:true,
+    rownumbers:true,
+    remoteSort:false,
+    columns:[[
+        {field:'sid',title:'学号',width:80,align:'center'},
+        {field:'sname',title:'学生姓名',width:120,align:'center'},
+        {field:'_operate',title:'考勤信息',width:600,align:'center',formatter:function(val, row, index) {
+        	var str = "<input type='radio' checked name='attendance_"+row.sid+"' id='attendance_0"+row.sid+"' value='1'/><label class='mylbl' for='attendance_0"+row.sid+"'>已到</label>";
+        	str += "<input type='radio' name='attendance_"+row.sid+"' id='attendance_1"+row.sid+"' value='2'/><label class='mylbl' for='attendance_1"+row.sid+"'>迟到</label>";
+        	str += "<input type='radio' name='attendance_"+row.sid+"' id='attendance_2"+row.sid+"' value='3'/><label class='mylbl' for='attendance_2"+row.sid+"'>旷课</label>";
+        	str += "<input type='radio' name='attendance_"+row.sid+"' id='attendance_3"+row.sid+"' value='4'/><label class='mylbl' for='attendance_3"+row.sid+"'>病假</label>";
+        	str += "<input type='radio' name='attendance_"+row.sid+"' id='attendance_4"+row.sid+"' value='5'/><label class='mylbl' for='attendance_4"+row.sid+"'>事假</label>";
+        	return str;
+        }},
+        {field:'remark',title:'备注',width:200,align:'center',formatter:function(val, row, index) {
+        	return "<input type='text' id='attendance_ipt_"+row.sid+"' class='myipt' style='width:200px'/>";
+        }}
+    ]],
+    toolbar:"#attendance_search"
+});  
+
+function searchAttendanceStuInfo() {
+	$("#attendance_info").text("");
+	var cid = $.trim($("#attendance_search_cid").val());
+	var adate = $.trim($("#attendance_search_adate").datebox('getValue'));
+	var timeslot = $.trim($("#attendance_search_timeslot").val());
+	
+	if (cid == "") {
+		$.messager.show({title:'温馨提示',msg:'请选择考勤班级...',timeout:3000, showType:'slide'});
+		return;
+	}
+	
+	if (adate == "") {
+		adate = dataStr;
+	}
+	
+	$('#attendance_data').datagrid({
+		url:"../attendance",
+		queryParams:{op:"findByClass", cid:cid, adate:adate, timeslot:timeslot},
+		onLoadSuccess:function(data) {
+			console.info(data);
+			if(data.total == 0) {
+				$.messager.alert("温馨提示", "该班级本时段已经考勤，如果修改考勤请选择考勤修改...", "info");
+				return;
+			}
+		}
+	});
+}
+
+function addAttendanceStuInfo() {
+	var cid = $.trim($("#attendance_search_cid").val());
+	var adate = $.trim($("#attendance_search_adate").datebox('getValue'));
+	var timeslot = $.trim($("#attendance_search_timeslot").val());
+	
+	if (cid == "") {
+		$.messager.show({title:'温馨提示',msg:'请选择考勤班级...',timeout:3000, showType:'slide'});
+		return;
+	}
+	
+	if (adate == "") {
+		adate = dataStr;
+	}
+	
+	if (timeslot == "") {
+		$.messager.show({title:'温馨提示',msg:'请选择考勤时间段...',timeout:3000, showType:'slide'});
+		return;
+	}
+	
+	var rows = attendance_obj.datagrid("getRows");
+	if (rows.length == 0){
+		$.messager.show({title:'温馨提示',msg:'请选择考勤班级...',timeout:3000, showType:'slide'});
+		return;
+	}
+	
+	var str = "";
+	$.each(rows, function(index, item) {
+		str += item.sid + "-" + $("input[name='attendance_"+item.sid+"']:checked").val() + "- " + $("#attendance_ipt_"+item.sid).val() + ",";
+	});
+	str = str.substring(0, str.lastIndexOf(","));
+	
+	if (contentStr == "") {
+		contentStr = str;
+	} else if(contentStr == str){
+		return;
+	}
+	
+	$.post("../attendance", {op:"add", cid:cid, adate:adate, timeslot:timeslot, content:str}, function(data) {
+		data = parseInt($.trim(data));
+		if (data == -3) {
+			$.messager.alert("温馨提示", "该班级本时段已经考勤，如果修改考勤请选择考勤修改...", "info");
+		} else if (data == -2) {
+			$.messager.alert("温馨提示","请先登录...","warning");
+			location.href="../login.html";
+		} else if (data == -1) {
+			$.messager.show({title:'温馨提示',msg:'您输入的信息不完整，请确认后重新提交...',timeout:3000, showType:'slide'});
+		} else if (data > 0) {
+			$.messager.show({title:'温馨提示',msg:'考勤信息添加成功...',timeout:3000, showType:'slide'});
+			$("#attendance_info").css("color","green").text("已提交");
+		} else {
+			$.messager.alert("失败提示", "考勤信息添加失败，请稍后重试...", "error");
+		}
+	}, "text");
+}
+
+</script>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>hello</title>
+<script type="text/javascript" src="js/jquery-1.11.3.js"></script>
+<script type="text/javascript">
+function findAll(){
+	$.get("findAll",{},function(data){
+		var str="";
+		$.each(data,function(index,item){
+			str+="<tr><td>"+item.aid+"</td><td>"+item.aname+"</td><td>"+item.email+"</td></tr>";
+		})
+		$("#infos").append($(str));
+	},"json")
+}
+
+</script>
+</head>
+<body>
+<h1><a href="hello">hello</a></h1>
+<h1><a href="javascript:findAll()">findAll</a></h1>
+<table border="1px" align="center" width="90%" cellspacing="0px" cellpadding="0px">
+	<thead>
+		<tr>
+			<th>编号</th>
+			<th>姓名</th>
+			<th>邮箱</th>
+		</tr>
+	</thead>
+	<tbody align="center" id="infos">
+	
+	</tbody>
+</table>
+</body>
+</html>

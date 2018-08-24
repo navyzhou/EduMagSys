@@ -1,0 +1,182 @@
+<table id="classInfo_data" data-options="fit:true"></table>  
+
+<div id="classInfo_search">
+	<a href="javascript:openAddClassInfoRow()" class="easyui-linkbutton" data-options="iconCls:'icon-group-add',plain:true" style="float:left">添加</a> 
+	<div class="datagrid-btn-separator"></div>
+	<a href="javascript:openUpdateClassInfoRow()" class="easyui-linkbutton" data-options="iconCls:'icon-group-edit',plain:true" style="float:left">修改</a>  
+	<div class="datagrid-btn-separator"></div>	
+	<a href="javascript:saveClassInfo()" class="easyui-linkbutton" data-options="iconCls:'icon-group-gear',plain:true" style="float:left">保存</a>  
+	<div class="datagrid-btn-separator"></div>	
+	<a href="javascript:undoClassInfo()" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" style="float:left">撤销</a>  
+	<div class="datagrid-btn-separator"></div>	
+	<label for="classInfo_search_cname">班级名称：</label>
+	<input id="classInfo_search_cname" class="myipt" placeholder="请输入班级名称..." style="width:120px"/>
+	<label class="mylabel">班级方向：</label>
+	<select id="classInfo_search_tid" class="myselect">
+		<option value="">--请选择--</option>
+	</select>
+	<label for="classInfo_search_sdate" class="mylabel">开班日期：</label>
+	<input type="text" id="classInfo_search_sdate" class="easyui-datebox" style="width:110px"/>&nbsp; - &nbsp;
+	<input type="text" id="classInfo_search_edate" class="easyui-datebox" style="width:110px"/>
+	<label class="mylabel">班级状态：</label>
+	<select id="classInfo_search_status" class="myselect">
+		<option value="">--请选择--</option>
+		<option value="1">未结业</option>
+		<option value="2">已结业</option>
+	</select>
+	<a href="javascript:searchClassInfo()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</a> 
+</div>
+<script>
+var classInfo_editRow = undefined;
+var classInfo_Obj;
+var classInfo_status_Obj=[{id:1,name:'未结业'},{id:2,name:'已结业'}];
+var classInfo_semester_Obj=[{id:1,name:'第一学期'},{id:2,name:'第二学期'},{id:3,name:'第三学期'},{id:4,name:'第四学期'}];
+var classInfo_train_Obj;
+var classInfo_flag;
+var classInfo_op;
+
+$(function(){
+	$.getJSON("../trainInfo", {op:"findAll"}, function(data){
+		classInfo_train_Obj = data;
+		createClassInfoDatagrid();
+		var str ="";
+		$.each(data, function(index, item){
+			str += "<option value='" + item.tid + "'>" + item.tname + "</option>";		
+		});
+		$("#classInfo_search_tid").append($(str));
+	});
+	
+});
+function createClassInfoDatagrid() {
+	classInfo_Obj=$('#classInfo_data').datagrid({    
+	    url:'../classInfo',
+	    queryParams:{op:"findByPage"},
+	    fitColumns:true,
+	    striped:true,
+	    nowrap:true,
+	    loadMsg:'数据加载中...',
+	    rownumbers:true,
+	    pagination:true,
+	    singleSelect:true,
+	    sortName:"cid",
+	    remoteSort:false,
+	    pageNumber:1,
+	    pageSize: 10,
+	    pageList:[5,10,20,30,40,50],
+	    columns:[[
+	        {checkbox:true},     
+	        {field:'cid',title:'班级编号',width:100,align:'center',sortable:true},    
+	        {field:'cname',title:'班级名称',width:120,align:'center',editor:{type:"text",options:{required:true}}},    
+	        {field:'tid',title:'班级方向',width:100,align:'center',formatter:function(val, row, index){
+	        	for (var i = 0,len = classInfo_train_Obj.length; i < len; i++) {
+	        		if (val == classInfo_train_Obj[i].tid) {
+	        			return classInfo_train_Obj[i].tname;
+	        		}
+	        	}
+	        	
+	        },editor:{type:"combobox",options:{required:true,valueField:'tid',textField:'tname',data:classInfo_train_Obj}}},    
+	        {field:'cdate',title:'开班时间',width:120,align:'center',editor:{type:"datebox",options:{required:true}}},    
+	        {field:'semester',title:'学期',width:100,align:'center',formatter:function(val, row, index){
+	        	for (var i = 0,len = classInfo_semester_Obj.length; i < len; i++) {
+	        		if (val == classInfo_semester_Obj[i].id) {
+	        			return classInfo_semester_Obj[i].name;
+	        		}
+	        	}
+	        },editor:{type:"combobox",options:{required:true,valueField:'id',textField:'name',data:classInfo_semester_Obj}}},    
+	        {field:'edate',title:'结业日期',width:120,align:'center',editor:{type:"datebox"}},    
+	        {field:'status',title:'班级状态',width:100,align:'center',formatter:function(val, row, index){
+	        	for (var i = 0,len = classInfo_status_Obj.length; i < len; i++) {
+	        		if (val == classInfo_status_Obj[i].id) {
+	        			return classInfo_status_Obj[i].name;
+	        		}
+	        	}
+	        	
+	        },editor:{type:"combobox",options:{required:true,valueField:'id',textField:'name',data:classInfo_status_Obj}}},    
+	        {field:'remark',title:'班级描述',width:120,align:'center',editor:{type:"text",options:{required:true}}}
+	    ]],
+	    toolbar:"#classInfo_search"
+	});  
+}
+
+function openAddClassInfoRow() {
+	classInfo_flag = "添加";
+	classInfo_op = "add";
+	if (classInfo_editRow == undefined) {
+		// 在表格中添加一行
+		classInfo_Obj.datagrid("insertRow",{index:0, row:{}});
+		// 开始编辑哪一行
+		classInfo_Obj.datagrid("beginEdit", 0);
+		
+		classInfo_editRow = 0; // 记录当前正在被编辑的行的索引
+	}
+}
+
+function openUpdateClassInfoRow() {
+	classInfo_flag = "修改";
+	classInfo_op = "update";
+	
+	if (classInfo_editRow != undefined) { // 说你有正在被编辑的行
+		classInfo_Obj.datagrid("beginEdit", classInfo_editRow);
+		classInfo_Obj.datagrid("rejectChanges"); // 回滚所有数据
+		classInfo_Obj.datagrid("uncheckAll"); // 取消所有勾选
+		classInfo_editRow = undefined
+	}
+	
+	var row = classInfo_Obj.datagrid("getChecked")[0]; // 获取选中行
+	if (row == undefined) {
+		$.messager.show({title:'温馨提示',msg:'请勾选您要修改的数据...',timeout:3000,	showType:'slide'});
+	} else {
+		// 先获取用户选中的行的索引，然后开启编辑
+		classInfo_editRow =  classInfo_Obj.datagrid("getRowIndex", row);
+		classInfo_Obj.datagrid("beginEdit", classInfo_editRow);
+	}
+}
+
+function saveClassInfo(){
+	if (classInfo_editRow != undefined) {
+		// 结束编辑
+		classInfo_Obj.datagrid("endEdit", classInfo_editRow);
+		
+		// 获取用户编辑的所有数据行中的第一行
+		var row = classInfo_Obj.datagrid("getChanges")[0];
+		row.op = classInfo_op;
+		
+		if (row != undefined) {
+			$.post("../classInfo", row, function(data){
+				data = parseInt($.trim(data));
+				if (data == -1) {
+					$.messager.show({title:'温馨提示',msg:'您输入的信息不完整，请重新操作...',timeout:3000,	showType:'slide'});
+				} else if (data > 0) {
+					$.messager.show({title:'成功提示',msg:'班级信息' + classInfo_flag + '成功...',timeout:3000, showType:'slide'});
+					classInfo_Obj.datagrid("reload"); // 重新加载数据
+				} else {
+					$.messager.alert('失败提示','班级信息' + classInfo_flag + '失败，请稍后重试...','error');
+					classInfo_Obj.datagrid("rejectChanges"); // 回滚所有数据
+				}
+			},"text");
+		}
+		classInfo_editRow = undefined;
+		classInfo_Obj.datagrid("uncheckAll");
+	}
+}
+
+function searchClassInfo() {
+	var cname = $.trim($("#classInfo_search_cname").val());
+	var tid = $.trim($("#classInfo_search_tid").val());
+	var status = $.trim($("#classInfo_search_status").val());
+	
+	var sdate = $.trim($("#classInfo_search_sdate").datebox('getValue'));
+	var edate = $.trim($("#classInfo_search_edate").datebox('getValue'));
+	
+	$('#classInfo_data').datagrid({
+		url:"../classInfo",
+		queryParams:{op:"findByCondition", cname:cname, tid:tid, status:status, sdate:sdate, edate:edate}
+	});
+}
+
+function undoClassInfo() {
+	classInfo_Obj.datagrid("rejectChanges"); // 回滚所有数据
+	classInfo_Obj.datagrid("uncheckAll"); // 取消所有勾选
+	classInfo_editRow = undefined;
+}
+</script>

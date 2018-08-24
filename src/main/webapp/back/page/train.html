@@ -1,0 +1,116 @@
+<table id="train_data" data-options="fit:true"></table>  
+
+<script>
+var train_editRow = undefined;
+var train_flag;
+var train_op;
+var train_status_Obj=[{id:0,name:'下架'},{id:1,name:'正常'}];
+
+var train_Obj = $('#train_data').datagrid({    
+    url:'../trainInfo',
+    queryParams:{op:"findByPage"},
+    fitColumns:true,
+    striped:true,
+    nowrap:true,
+    loadMsg:'数据加载中...',
+    rownumbers:true,
+    pagination:true,
+    singleSelect:true,
+    sortName:"tid",
+    remoteSort:false,
+    pageNumber:1,
+    pageSize: 10,
+    pageList:[5,10,20,30,40,50],
+    columns:[[
+        {checkbox:true},     
+        {field:'tid',title:'课程方向编号',width:100,align:'center',sortable:true},    
+        {field:'tname',title:'课程方向名称',width:200,align:'center',editor:{type:"text",options:{required:true}}},    
+        {field:'status',title:'课程方向状态',width:100,align:'center',formatter:function(val, row, index){
+        	for (var i = 0,len = train_status_Obj.length; i < len; i++) {
+        		if (val == train_status_Obj[i].id) {
+        			return train_status_Obj[i].name;
+        		}
+        	}
+        	
+        },editor:{type:"combobox",options:{required:true,valueField:'id',textField:'name',data:train_status_Obj}}}    
+    ]],
+    toolbar: [{
+    	text:"添加",
+		iconCls: 'icon-bookmark-add',
+		handler: function(){
+			train_flag = "添加";
+			train_op = "add";
+			
+			if (train_editRow == undefined) {
+				// 在表格中添加一行
+				train_Obj.datagrid("insertRow",{index:0, row:{}});
+				// 开始编辑哪一行
+				train_Obj.datagrid("beginEdit", 0);
+				
+				train_editRow = 0; // 记录当前正在被编辑的行的索引
+			}
+		}
+	},'-',{
+		text:"修改",
+		iconCls: 'icon-bookmark-edit',
+		handler: function(){
+			train_flag = "修改";
+			train_op = "update";
+			
+			if (train_editRow != undefined) { // 说你有正在被编辑的行
+				train_Obj.datagrid("beginEdit", train_editRow);
+				train_Obj.datagrid("rejectChanges"); // 回滚所有数据
+				train_Obj.datagrid("uncheckAll"); // 取消所有勾选
+				train_editRow = undefined
+			}
+			
+			var row = train_Obj.datagrid("getChecked")[0]; // 获取选中行
+			if (row == undefined) {
+				$.messager.show({title:'温馨提示',msg:'请勾选您要修改的数据...',timeout:3000,	showType:'slide'});
+			} else {
+				// 先获取用户选中的行的索引，然后开启编辑
+				train_editRow =  train_Obj.datagrid("getRowIndex", row);
+				train_Obj.datagrid("beginEdit", train_editRow);
+			}
+		}
+	},'-',{
+		text:"保存",
+		iconCls: 'icon-folder-bookmark',
+		handler: function(){
+			if (train_editRow != undefined) {
+				// 结束编辑
+				train_Obj.datagrid("endEdit", train_editRow);
+				
+				// 获取用户编辑的所有数据行中的第一行
+				var row = train_Obj.datagrid("getChanges")[0];
+				row.op = train_op;
+				
+				if (row != undefined) {
+					$.post("../trainInfo", row, function(data){
+						data = parseInt($.trim(data));
+						if (data == -1) {
+							$.messager.show({title:'温馨提示',msg:'课程方向名称不能为空...',timeout:3000,	showType:'slide'});
+						} else if (data > 0) {
+							$.messager.show({title:'成功提示',msg:'课程方向信息' + train_flag + '成功...',timeout:3000,	showType:'slide'});
+							train_Obj.datagrid("reload"); // 重新加载数据
+						} else {
+							$.messager.alert('失败提示','课程方向信息' + train_flag + '失败，请稍后重试...','error');
+						}
+					},"text");
+				}
+				
+				train_editRow = undefined;
+			}
+		}
+	},'-',{
+		text:"撤销",
+		iconCls: 'icon-undo',
+		handler: function(){
+			train_Obj.datagrid("rejectChanges"); // 回滚所有数据
+			train_Obj.datagrid("uncheckAll"); // 取消所有勾选
+			train_editRow = undefined;
+		}
+	}]
+});  
+
+</script>

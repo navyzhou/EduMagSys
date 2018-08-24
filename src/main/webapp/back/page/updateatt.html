@@ -1,0 +1,178 @@
+<table id="updateatt_data" data-options="fit:true"></table>  
+
+<div id="updateatt_search">
+	<label class="mylabel">班级方向：</label>
+	<select id="updateatt_search_train" class="myselect" onchange="changeUpdateAttClassInfo(this.value)">
+		<option value="">--请选择--</option>
+	</select>
+	<label class="mylabel">考勤班级：</label>
+	<select id="updateatt_search_cid" class="myselect">
+	</select>
+	<label class="mylabel">考勤日期：</label>
+	<input type="text" id="updateatt_search_adate" class="easyui-datebox"/>
+	
+	<label class="mylabel">考勤时段：</label>
+	<select id="updateatt_search_timeslot" class="myselect">
+		<option value="1">上午</option>
+		<option value="2">下午</option>
+		<option value="3">晚上</option>
+	</select>
+	&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:searchUpdateAttStuInfo()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</a>&nbsp;&nbsp;&nbsp;&nbsp;
+	<a href="javascript:updateAttStuInfo()" class="easyui-linkbutton" data-options="iconCls:'icon-edit'">提交</a> 
+	<label class="mylabel" id="updateatt_info"></label>
+</div>
+
+<script>
+var updateatt_class_info;
+var dateAtt = new Date();
+var dataAttStr = dateAtt.getFullYear()+"-"+(dateAtt.getMonth()+1)+"-"+dateAtt.getDate();
+var contentAttStr = "";
+
+$(function(){
+	$("#updateatt_search_adate").datebox();
+	$("#updateatt_search_adate").datebox('setValue', dataAttStr);
+	
+	var time = dateAtt.getHours();
+
+	if (time < 13) {
+		$("#updateatt_search_timeslot").val(1);
+	} else if (time < 18) {
+		$("#updateatt_search_timeslot").val(2);
+	} else {
+		$("#updateatt_search_timeslot").val(3);
+	}
+	
+	$.getJSON("../attendance", {op:"findByTrainAndClass"}, function(data){
+		updateatt_class_info = data.classInfos;
+		var str ="";
+		$.each(data.trains, function(index, item){
+			str += "<option value='" + item.tid + "'>" + item.tname + "</option>";		
+		});
+		$("#updateatt_search_train").append($(str));
+	});
+});
+
+function changeUpdateAttClassInfo(val) {
+	var str ="";
+	$.each(updateatt_class_info, function(index, item){
+		if (item.tid == val) {
+			str += "<option value='" + item.cid + "'>" + item.cname + "</option>";	
+		}
+	});
+	$("#updateatt_search_cid").html("").append($(str));
+}
+
+var update_attendance_status=["","已到","迟到","旷课","病假","事假"];
+
+var updateatt_obj = $('#updateatt_data').datagrid({    
+    fitColumns:true,
+    striped:true,
+    nowrap:true,
+    loadMsg:'数据加载中...',
+    singleSelect:true,
+    rownumbers:true,
+    remoteSort:false,
+    columns:[[
+        {field:'sid',title:'学号',width:80,align:'center'},
+        {field:'sname',title:'学生姓名',width:120,align:'center'},
+        {field:'_operate',title:'考勤信息',width:600,align:'center',formatter:function(val, row, index) {
+        	var str="";
+        	for (var i = 1; i <= 5; i++) {
+        		if (i == row.spare1) {
+        			str += "<input type='radio' checked name='updateatt_"+row.sid+"' id='updateatt_"+i+row.sid+"' value='"+i+"'/><label class='mylbl' for='updateatt_"+i+row.sid+"'>"+update_attendance_status[i]+"</label>";
+        		} else {
+        			str += "<input type='radio' name='updateatt_"+row.sid+"' id='updateatt_"+i+row.sid+"' value='"+i+"'/><label class='mylbl' for='updateatt_"+i+row.sid+"'>"+update_attendance_status[i]+"</label>";
+        		}
+        	}
+        	return str;
+        }},
+        {field:'remark',title:'备注',width:200,align:'center',formatter:function(val, row, index) {
+        	return "<input type='text' id='updateatt_ipt_"+row.sid+"' class='myipt' style='width:200px' value='"+row.spare2+"'/>";
+        }}
+    ]],
+    toolbar:"#updateatt_search"
+});  
+
+var atid = 0;
+function searchUpdateAttStuInfo() {
+	var cid = $.trim($("#updateatt_search_cid").val());
+	var adate = $.trim($("#updateatt_search_adate").datebox('getValue'));
+	var timeslot = $.trim($("#updateatt_search_timeslot").val());
+	
+	if (cid == "") {
+		$.messager.show({title:'温馨提示',msg:'请选择考勤班级...',timeout:3000, showType:'slide'});
+		return;
+	}
+	
+	if (adate == "") {
+		adate = dataAttStr;
+	}
+	
+	if (timeslot == "") {
+		$.messager.show({title:'温馨提示',msg:'请选择考勤时间段...',timeout:3000, showType:'slide'});
+		return;
+	}
+	
+	$('#updateatt_data').datagrid({
+		url:"../attendance",
+		queryParams:{op:"findByUpdateInfo", cid:cid, adate:adate, timeslot:timeslot},
+		onLoadSuccess:function(data) {
+			atid = data.atid;
+		}
+	});
+}
+
+
+function updateAttStuInfo() {
+	var cid = $.trim($("#updateatt_search_cid").val());
+	var adate = $.trim($("#updateatt_search_adate").datebox('getValue'));
+	var timeslot = $.trim($("#updateatt_search_timeslot").val());
+	
+	if (cid == "") {
+		$.messager.show({title:'温馨提示',msg:'请选择考勤班级...',timeout:3000, showType:'slide'});
+		return;
+	}
+	
+	if (adate == "") {
+		adate = dataAttStr;
+	}
+	
+	if (timeslot == "") {
+		$.messager.show({title:'温馨提示',msg:'请选择考勤时间段...',timeout:3000, showType:'slide'});
+		return;
+	}
+	
+	var rows = updateatt_obj.datagrid("getRows");
+	if (rows.length == 0){
+		$.messager.show({title:'温馨提示',msg:'请选择考勤班级...',timeout:3000, showType:'slide'});
+		return;
+	}
+	
+	var str = "";
+	$.each(rows, function(index, item) {
+		str += item.sid + "-" + $("input[name='updateatt_"+item.sid+"']:checked").val() + "- " + $("#updateatt_ipt_"+item.sid).val().trim() + ",";
+	});
+	str = str.substring(0, str.lastIndexOf(","));
+	
+	if (contentAttStr == "") {
+		contentAttStr = str;
+	} else if(contentAttStr == str){
+		return;
+	}
+	
+	$.post("../attendance", {op:"update", adate:adate, timeslot:timeslot, content:str, atid:atid}, function(data) {
+		data = parseInt($.trim(data));
+		if (data == -2) {
+			$.messager.alert("温馨提示","请先登录...","warning");
+			location.href="../login.html";
+		} else if (data == -1) {
+			$.messager.show({title:'温馨提示',msg:'您输入的信息不完整，请确认后重新提交...',timeout:3000, showType:'slide'});
+		} else if (data > 0) {
+			$.messager.show({title:'温馨提示',msg:'考勤信息修改成功...',timeout:3000, showType:'slide'});
+			$("#updateatt_info").css("color","green").text("已提交");
+		} else {
+			$.messager.alert("失败提示", "考勤信息修改失败，请稍后重试...", "error");
+		}
+	}, "text");
+}
+</script>

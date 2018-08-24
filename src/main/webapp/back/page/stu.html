@@ -1,0 +1,486 @@
+<table id="stuInfo_data" data-options="fit:true"></table>  
+
+<div id="stuInfo_search">
+	<a href="javascript:openAddStuInfoDialog()" class="easyui-linkbutton" data-options="iconCls:'icon-user-add',plain:true" style="float:left">添加</a> 
+	<div class="datagrid-btn-separator"></div>
+	<a href="javascript:saveAdminInfo()" class="easyui-linkbutton" data-options="iconCls:'icon-user-tick',plain:true" style="float:left">保存</a>  
+	<div class="datagrid-btn-separator"></div>	
+	<label for="stuInfo_search_sname">学生姓名：</label>
+	<input id="stuInfo_search_sname" class="myipt" placeholder="请输入学生姓名..."/>
+	<label class="mylabel">课程方向：</label>
+	<select id="stuInfo_search_tid" class="myselect" onchange="changeStuClassInfo(this.value)">
+		<option value="">--请选择--</option>
+	</select>
+	<label class="mylabel">所在班级：</label>
+	<select id="stuInfo_search_cid" class="myselect">
+		<option value="">--请选择--</option>
+	</select>
+	<label class="mylabel">学生状态：</label>
+	<select id="stuInfo_search_status" class="myselect">
+		<option value="">--请选择--</option>
+		<option value="0">已删</option>
+		<option value="1">正常</option>
+		<option value="2">休学</option>
+		<option value="3">退学</option>
+	</select>
+	<label for="stuInfo_search_tel" class="mylabel">联系方式：</label>
+	<input id="stuInfo_search_tel" class="myipt" placeholder="请输入学生联系方式..."/>
+	<a href="javascript:searchStuInfo()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</a> 
+	<a href="javascript:showAddBathStuInfo()" class="easyui-linkbutton" data-options="iconCls:'icon-user-add'">批量导入</a> 
+</div>
+
+ <div id="stu_dialog" class="easyui-dialog" data-options="closed:true">
+    <form id="stuInfo_form">
+    	<ul>
+    		<li>
+    			<label>班级：</label>
+    			<select id="stu_dialog_cid" class="myselect">
+    			
+    			</select>
+    			<span></span>
+    		</li>
+    		<li>
+    			<input type="hidden" id="stu_dialog_sid">
+    			<label>姓名：</label>
+    			<input type="text" id="stu_dialog_sname" class="myipt" placeholder="请输入学生姓名..."/>
+    			<span></span>
+    		</li>
+    		<li>
+    			<label>密码：</label>
+    			<input type="password" id="stu_dialog_pwd" class="myipt" placeholder="请输入学生密码..." value="123321"/>
+    			<span></span>
+    		</li>
+    		<li>
+    			<label>联系方式：</label>
+    			<input type="tel" id="stu_dialog_tel" class="myipt" placeholder="请输入学生的联系方式..."/>
+    			<span></span>
+    		</li>
+    		<li>
+    			<label>身份证号码：</label>
+    			<input type="text" maxlength="18" id="stu_dialog_cardId" class="myipt" placeholder="请输入学生身份证号码..."/>
+    			<span></span>
+    		</li>
+    		<li>
+    			<label>父母姓名：</label>
+    			<input type="text" id="stu_dialog_parentName" class="myipt" placeholder="请输入学生的父母姓名..."/>
+    			<span></span>
+    		</li>
+    		<li>
+    			<label>父母电话：</label>
+    			<input type="tel" id="stu_dialog_parentTel" class="myipt" placeholder="请输入学生父母电话..."/>
+    			<span></span>
+    		</li>
+    		<li>
+    			<label>联系地址：</label>
+    			<input type="text" id="stu_dialog_addr" class="myipt" placeholder="请输入学生的联系地址..."/>
+    		</li>
+    		<li>
+    			<label>状态：</label>
+    			<select id="stu_dialog_status" class="myselect">
+    				<option value="0">已删</option>
+    				<option value="1" selected="selected">正常</option>
+    				<option value="2">休学</option>
+    				<option value="3">退学</option>
+    			</select>
+    			<span></span>
+    		</li>
+    		<li>
+    			<label>备注：</label>
+    			<input type="text" id="stu_dialog_remark" class="myipt" placeholder="请输入学生的联系地址..."/>
+    		</li>
+    		<li class="myfile">
+    			<label>学生照片：</label>
+    			<input type="file" id="stu_dialog_photo" name="photo" onchange="setImagePreviews(this,'stuInfo_photo_view', 200, 200)"/>
+    		</li>
+    		<li class="myfile">
+    			<label>身份证正面照：</label>
+    			<input type="file" id="stu_dialog_cardPositive" name="cardPositive" onchange="setImagePreviews(this,'stuInfo_cardPositive_view', 395, 200)"/>
+    		</li>
+    		<li class="myfile">
+    			<label>身份证背面照：</label>
+    			<input type="file" id="stu_dialog_cardNegative" name="cardNegative" onchange="setImagePreviews(this,'stuInfo_cardNegative_view', 395, 200)"/>
+    		</li>
+    	</ul>
+    </form>
+    
+    <div id="stuInfo_pic_view">
+    	<div id="stuInfo_photo_view" class="stuInfo_pic_view1">
+    	
+    	</div>
+    	
+    	<div id="stuInfo_cardPositive_view" class="stuInfo_pic_view2">
+    	
+    	</div>
+    	
+    	<div id="stuInfo_cardNegative_view" class="stuInfo_pic_view3">
+    	
+    	</div>
+    </div>
+</div>
+
+<div id="addbathstu_dialog" class="easyui-dialog" data-options="closed:true" style="width:620px; padding:20px;">
+	<form id="addstu_form_excel">
+		<label class="navy_label">请选择文件：</label>
+		<input type="file" accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" name="addstu_excel" id="addstu_excel_file" />
+		<a href="javascript:addStuInfoForExcel()" class="easyui-linkbutton" data-options="iconCls:'icon-page-white-excel'">批量导入</a>
+		<a href="../excel/stuInfo.xls" title="点击下载学生信息表格模板" class="easyui-linkbutton" data-options="iconCls:'icon-page-excel'">下载表格模板</a>
+	</form>
+</div>
+<script>
+var stuInfo_editRow = undefined;
+var stuInfo_Obj;
+var stuInfo_status_Obj=[{id:0,name:'已删'},{id:1,name:'正常'},{id:2,name:'休学'},{id:3,name:'退学'}];
+var stuInfo_class_Obj;
+var stuInfo_flag;
+var stuInfo_op;
+
+
+$(function(){
+	$.getJSON("../stuInfo", {op:"findByTrainAndClass"}, function(data){
+		stuInfo_class_Obj = data.classInfos;
+		createStuInfoDatagrid();
+		var str ="";
+		$.each(data.classInfos, function(index, item){
+			if (item.status == 1) {
+				str += "<option value='" + item.cid + "'>" + item.cname + "</option>";
+			}
+		});
+		$("#stu_dialog_cid").append($(str));
+		
+		var tarinStr = "";
+		$.each(data.trains, function(index, item){
+			tarinStr += "<option value='" + item.tid + "'>" + item.tname + "</option>";
+		});
+		$("#stuInfo_search_tid").append($(tarinStr));
+	});
+	
+	$("#stuInfo_form>ul>li>input").focus(function(){
+		$(this).removeClass("myerr");
+		$(this).next("span").text("");
+	})
+});
+
+function changeStuClassInfo(val) {
+	var str ="";
+	$.each(stuInfo_class_Obj, function(index, item){
+		if (item.tid == val) {
+			str += "<option value='" + item.cid + "'>" + item.cname + "</option>";	
+		}
+	});
+	$("#stuInfo_search_cid").html("").append($(str));
+}
+
+function createStuInfoDatagrid() {
+	stuInfo_Obj = $('#stuInfo_data').datagrid({    
+	    url:'../stuInfo',
+	    queryParams:{op:"findByPage"},
+	    fitColumns:true,
+	    striped:true,
+	    nowrap:true,
+	    loadMsg:'数据加载中...',
+	    rownumbers:true,
+	    pagination:true,
+	    singleSelect:true,
+	    sortName:"sid",
+	    remoteSort:false,
+	    pageNumber:1,
+	    pageSize: 20,
+	    pageList:[5,10,20,30,40,50],
+	    columns:[[
+	        {field:'sid',title:'学号',width:80,align:'center',sortable:true},    
+	        {field:'sname',title:'姓名',width:100,align:'center'},    
+	        {field:'cid',title:'班级',width:100,align:'center',formatter:function(val, row, index){
+	        	for (var i = 0,len = stuInfo_class_Obj.length; i < len; i++) {
+	        		if (val == stuInfo_class_Obj[i].cid) {
+	        			return stuInfo_class_Obj[i].cname;
+	        		}
+	        	}
+	        }},  
+	        {field:'tel',title:'联系方式',width:120,align:'center'},
+	        {field:'cardId',title:'身份证号码',width:200,align:'center'},
+	        {field:'parentName',title:'父母姓名',width:100,align:'center'}, 
+	        {field:'parentTel',title:'父母电话',width:120,align:'center'},
+	        {field:'status',title:'状态',width:100,align:'center',formatter:function(val, row, index){
+	        	for (var i = 0,len = stuInfo_status_Obj.length; i < len; i++) {
+	        		if (val == stuInfo_status_Obj[i].id) {
+	        			return stuInfo_status_Obj[i].name;
+	        		}
+	        	}
+	        }},  
+	        {field:'_operate',title:'操作',width:160,align:'center',formatter:function(val, row, index) {
+	        	var str = "<a href='javascript:findStuInfoBySid("+row.sid+")' class='navy-icon-user-tick'>详细</a>";
+	        	str += "<a href='javascript:openUpdateStuInfoDialog("+row.sid+")' class='navy-icon-user-edit'>修改</a>";	
+	        	return str;
+	        }}
+	    ]],
+	    toolbar:"#stuInfo_search"
+	});  
+}
+
+
+var stu_dialog_obj;
+function addStuInfoTODB(op, flag) {
+	var cid = $.trim($("#stu_dialog_cid").val());
+	var sname = $.trim($("#stu_dialog_sname").val());
+	var pwd = $.trim($("#stu_dialog_pwd").val());
+	var tel = $.trim($("#stu_dialog_tel").val());
+	var cardId = $.trim($("#stu_dialog_cardId").val());
+	var parentName = $.trim($("#stu_dialog_parentName").val());
+	var parentTel = $.trim($("#stu_dialog_parentTel").val());
+	var addr = $.trim($("#stu_dialog_addr").val());
+	var remark = $.trim($("#stu_dialog_remark").val());
+	var sid = $.trim($("#stu_dialog_sid").val());
+	
+    var myTelReg=/^[1][3,4,5,7,8][0-9]{9}$/; // 手机号码
+    var myCardReg = /(^\d{18}$)|(^\d{17}(\d|X|x)$)/;  // 身份证号码
+    
+	if (sname == "") {
+		$("#stu_dialog_sname").addClass("myerr");
+		$("#stu_dialog_sname~span").text("请输入学生姓名...");
+		return;
+	}
+	
+	if (tel == "" || !myTelReg.test(tel)) {
+		$("#stu_dialog_tel").addClass("myerr");
+		$("#stu_dialog_tel~span").text("您输入的号码有误...");
+		return;
+	}
+	
+	if (cardId == "" || !myCardReg.test(cardId) ) {
+		$("#stu_dialog_cardId").addClass("myerr");
+		$("#stu_dialog_cardId~span").text("您输入的身份证号码有误...");
+		return;
+	}
+	
+	if (parentTel != "" && !myTelReg.test(parentTel)) {
+		$("#stu_dialog_parentTel").addClass("myerr");
+		$("#stu_dialog_parentTel~span").text("请输入正确的电话号码");
+		return;
+	}
+	
+	$.ajaxFileUpload({
+		url:"../stuInfo?op="+op,
+		secureuri:false,
+		fileElementId:["stu_dialog_photo", "stu_dialog_cardPositive", "stu_dialog_cardNegative"],
+		dataType:"text",
+		data:{sid:sid, cid:cid, sname:sname, pwd:pwd, tel:tel, cardId:cardId, parentName:parentName, parentTel:parentTel, addr:addr, remark:remark},
+		success:function(data, status) {
+			data = parseInt($.trim(data));
+			if (data == -1) {
+				$.messager.show({title:'温馨提示', msg:'您输入的学生信息不完整，请核对后再提交...', timeout:3000, showType:'slide'});
+				return;
+			} else if (data > 0) {
+				$("#stuInfo_form")[0].reset();
+				$("#stuInfo_photo_view").html("");
+				$("#stuInfo_cardPositive_view").html("");
+				$("#stuInfo_cardNegative_view").html("");
+				$.messager.show({title:'成功提示', msg:'学生信息'+flag+'成功...', timeout:3000, showType:'slide'});
+				stu_dialog_obj.dialog('close');
+				stuInfo_Obj.datagrid("reload"); // 重新加载数据
+			} else {
+				$.messager.alert('失败提示',"学生信息"+flag+"失败...",'error');
+			}
+		},
+		error:function(s, xml, status, e) {
+			$.messager.alert('失败提示',"学生信息"+flag+"失败...\n\n",'error');
+		}
+	});
+}
+
+function openAddStuInfoDialog(){
+	$("#stuInfo_form")[0].reset();
+	$("#stuInfo_photo_view").html("");
+	$("#stuInfo_cardPositive_view").html("");
+	$("#stuInfo_cardNegative_view").html("");
+	$("#stuInfo_form .myipt,#stuInfo_form .myselect").removeAttr("disabled");
+	$("#stuInfo_form .myfile").css("display","block");
+	
+	stu_dialog_obj = $('#stu_dialog').dialog({
+		title:'添加学生信息',
+		fit: true,
+		closed:false,
+		cache:false,
+		iconCls:"icon-user-add",
+		modal:true, 
+		buttons: [{
+			text: '确定',
+			iconCls: 'icon-ok',
+			handler:function(){
+				addStuInfoTODB("add", "添加");
+			}
+		}, {
+			text: '取消',
+			iconCls: 'icon-cancel',
+			handler: function () {
+				stuInfo_Obj.datagrid("unselectAll");
+				stu_dialog_obj.dialog('close');                    
+			}
+       }]
+	}); 
+	stu_dialog_obj.dialog("open");
+}
+
+function openUpdateStuInfoDialog(sid){
+	$("#stuInfo_form")[0].reset();
+	$("#stuInfo_photo_view").html("");
+	$("#stuInfo_cardPositive_view").html("");
+	$("#stuInfo_cardNegative_view").html("");
+	$("#stuInfo_form .myipt,#stuInfo_form .myselect").removeAttr("disabled");
+	$("#stuInfo_form .myfile").css("display","block");
+	
+	$.getJSON("../stuInfo", {op:"findBySid", sid:sid}, function(data) {
+		showStuInfoToForm(data);
+		
+		stu_dialog_obj = $('#stu_dialog').dialog({
+			title:'修改学生信息',
+			fit: true,
+			iconCls:"icon-user-edit",
+			modal:true, 
+			buttons: [{
+				text: '修改',
+				iconCls: 'icon-ok',
+				handler:function(){
+					addStuInfoTODB("update", "修改");
+				}
+			}, {
+				text: '取消',
+				iconCls: 'icon-cancel',
+				handler: function () {
+					stuInfo_Obj.datagrid("unselectAll");
+					stu_dialog_obj.dialog('close');                    
+				}
+	       }]
+		}); 
+		
+		stu_dialog_obj.dialog("open");
+	});
+}
+
+// 显示学生信息到表单中
+function showStuInfoToForm(data) {
+	$("#stuInfo_form")[0].reset();
+	
+	$("#stu_dialog_cid").val(data.cid);
+	$("#stu_dialog_sid").val(data.sid);
+	$("#stu_dialog_sname").val(data.sname);
+	$("#stu_dialog_pwd").val();
+	$("#stu_dialog_tel").val(data.tel);
+	$("#stu_dialog_cardId").val(data.cardId);
+	$("#stu_dialog_parentName").val(data.parentName);
+	$("#stu_dialog_parentTel").val(data.parentTel);
+	$("#stu_dialog_addr").val(data.addr);
+	$("#stu_dialog_remark").val(data.remark);
+	
+	if (data.photo != "" && data.photo != undefined) {
+		$("#stuInfo_photo_view").html("<img src='../"+data.photo+"' width='200px' height='200px'/>");
+	} else {
+		$("#stuInfo_photo_view").html("");
+	}
+	
+	if (data.cardPositive != "" && data.cardPositive != undefined) {
+		$("#stuInfo_cardPositive_view").html("<img src='../"+data.cardPositive+"' width='395px' height='200px'/>");
+	} else {
+		$("#stuInfo_cardPositive_view").html("");
+	}
+	
+	if (data.cardNegative != "" && data.cardNegative != undefined) {
+		$("#stuInfo_cardNegative_view").html("<img src='../"+data.cardNegative+"' width='395px' height='200px'/>");
+	} else {
+		$("#stuInfo_cardNegative_view").html("");
+	}
+}
+
+function findStuInfoBySid(sid) {
+	$.getJSON("../stuInfo", {op:"findBySid", sid:sid}, function(data) {
+		$("#stuInfo_form .myipt,#stuInfo_form .myselect").attr("disabled","true");
+		$("#stuInfo_form .myfile").css("display","none");
+		showStuInfoToForm(data);
+		
+		stu_dialog_obj = $('#stu_dialog').dialog({
+			title:'学生信息详细',
+			iconCls:"icon-user-star",
+			modal:true, 
+			fit: true,
+			buttons: [{
+				text: '关闭',
+				iconCls: 'icon-cancel',
+				handler: function () {
+					stuInfo_Obj.datagrid("unselectAll");
+					stu_dialog_obj.dialog('close');                    
+				}
+	       }]
+		}); 
+		
+		stu_dialog_obj.dialog("open");
+	});
+}
+
+var addStu_dialog_obj;
+function showAddBathStuInfo(){
+	addStu_dialog_obj = $('#addbathstu_dialog').dialog({
+		title:'批量导入学生信息',
+		iconCls:"icon-user-add",
+		modal:true, 
+		buttons: [{
+			text: '关闭',
+			iconCls: 'icon-cancel',
+			handler: function () {
+				stuInfo_Obj.datagrid("unselectAll");
+				addStu_dialog_obj.dialog('close');                    
+			}
+       }]
+	}); 
+	
+	addStu_dialog_obj.dialog("open");
+}
+
+function searchStuInfo() {
+	var sname = $.trim($("#stuInfo_search_sname").val());
+	var tid = $.trim($("#stuInfo_search_tid").val());
+	var cid = $.trim($("#stuInfo_search_cid").val());
+	var status = $.trim($("#stuInfo_search_status").val());
+	var tel = $.trim($("#stuInfo_search_tel").val());
+	
+	$('#stuInfo_data').datagrid({
+		url:"../stuInfo",
+		queryParams:{op:"findByCondition", sname:sname, tid:tid, cid:cid, status:status, tel:tel}
+	});
+}
+
+function addStuInfoForExcel(){
+	var fl = $("#addstu_excel_file")[0].value;
+	if ( !fl ){
+		$.messager.show({title:'温馨提示',msg:'请选择要导入的文件..',timeout:3000,showType:'slide'});
+		return;
+	}
+	
+	var patter = /(.xls)|(.xlsx)/ig;
+	if( !patter.test(fl) ){
+		$.messager.show({title:'温馨提示',msg:'您选择的文件格式有误，请重新选择..',timeout:3000,showType:'slide'});
+		return;
+	}
+
+	$.ajaxFileUpload({
+		url:"../stuInfo?op=bathAddStuInfos",
+		secureuri:false,
+		fileElementId:"addstu_excel_file",
+		dataType:"txt",
+		success:function(data,status){
+			data=parseInt($.trim(data));
+			if(data == -1){
+				$.messager.show({title:'温馨提示',msg:'请选择要导入的文件..',timeout:3000,showType:'slide'});
+			} else if (data > 0){
+				addStu_dialog_obj.dialog('close'); 
+				$.messager.show({title:'成功提示',msg:'学生信息批量导入成功...',timeout:3000,showType:'slide'});
+				$("#addstu_form_excel")[0].reset();
+				stuInfo_Obj.datagrid("reload"); // 重新加载数据
+			}else{
+				$.messager.alert('失败提示','学生信息批量导入失败...','error');
+			}
+		},
+		error:function(s, xml, status){
+			$.messager.alert('失败提示','学生信息批量导入失败...','error');
+		}
+	})
+}
+</script>

@@ -1,0 +1,171 @@
+<table id="statistics_data" data-options="fit:true"></table>  
+
+<div id="statistics_search">
+	<label class="mylabel">班级方向：</label>
+	<select id="statistics_search_train" class="myselect" onchange="changeStatisticsClassInfo(this.value)">
+		<option value="">--请选择--</option>
+	</select>
+	<label class="mylabel">考勤班级：</label>
+	<select id="statistics_search_cid" class="myselect">
+	</select>
+	<label class="mylabel">考勤日期：</label>
+	<input type="text" id="statistics_search_sdate" class="easyui-datebox"/> - 
+	<input type="text" id="statistics_search_edate" class="easyui-datebox"/>
+	
+	<label class="mylabel">考勤时段：</label>
+	<select id="statistics_search_timeslot" class="myselect">
+		<option value="">请选择</option>
+		<option value="1">上午</option>
+		<option value="2">下午</option>
+		<option value="3">晚上</option>
+	</select>
+	&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:searchStatisticsAttendance()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">统计</a>&nbsp;&nbsp;&nbsp;&nbsp;
+</div>
+
+<div id="statistics_dialog" class="easyui-dialog" data-options="closed:true">
+	<table align="center" width="100%" border='1px' cellspacing="0px" cellpadding="0px">
+		<thead align="center">
+			<tr>
+				<th>考勤日期</th>
+				<th>考勤时段</th>
+				<th>考勤状态</th>
+				<th>考勤备注</th>
+				
+				<th>考勤日期</th>
+				<th>考勤时段</th>
+				<th>考勤状态</th>
+				<th>考勤备注</th>
+			</tr>
+		</thead>
+	
+		<tbody align="center" id="statistics_dialog_detail">
+		
+		</tbody>
+	</table>
+</div>
+
+<style>
+#statistics_dialog tr{
+	line-height: 24px;
+}
+</style>
+<script>
+$(function(){
+	$.getJSON("../attendance", {op:"findByTrainAndClass"}, function(data){
+		attendance_class_info = data.classInfos;
+		var str ="";
+		$.each(data.trains, function(index, item){
+			str += "<option value='" + item.tid + "'>" + item.tname + "</option>";		
+		});
+		$("#statistics_search_train").append($(str));
+	});
+});
+
+function changeStatisticsClassInfo(val) {
+	var str ="";
+	$.each(attendance_class_info, function(index, item){
+		if (item.tid == val) {
+			str += "<option value='" + item.cid + "'>" + item.cname + "</option>";	
+		}
+	});
+	$("#statistics_search_cid").html("").append($(str));
+}
+
+
+$('#statistics_data').datagrid({    
+    fitColumns:true,
+    striped:true,
+    nowrap:true,
+    loadMsg:'数据加载中...',
+    rownumbers:true,
+    singleSelect:true,
+    remoteSort:false,
+    sortName:"rate",
+    sortOrder:"desc",
+    columns:[[
+        {field:'sid',title:'学号',width:80,align:'center'},
+        {field:'sname',title:'学生姓名',width:120,align:'center'},
+        {field:'normal',title:'正常次数',width:120,align:'center'},
+        {field:'late',title:'迟到次数',width:120,align:'center'},
+        {field:'absenteeism',title:'旷课次数',width:120,align:'center'},
+        {field:'sleave',title:'病假次数',width:120,align:'center'},
+        {field:'cleave',title:'事假次数',width:120,align:'center'},
+        {field:'total',title:'考勤总计',width:120,align:'center'},
+        {field:'rate',title:'出勤率',width:120,align:'center',sortable:true,formatter:function(val, row, index) {
+        	return val+"%";
+        }},
+        {field:'_operate',title:'操作',width:160,align:'center',formatter:function(val, row, index) {
+        	return "<a href=\"javascript:findStatisticsBySid("+row.sid+",'"+row.sname+"')\" class='navy-icon-user-tick'>详细</a>";
+        }}
+    ]],
+    toolbar:"#statistics_search"
+});  
+
+var stu_statistics_info;
+
+function searchStatisticsAttendance() {
+	var cid = $.trim($("#statistics_search_cid").val());
+	
+	var sdate = $.trim($("#statistics_search_sdate").datebox('getValue'));
+	var edate = $.trim($("#statistics_search_edate").datebox('getValue'));
+	var timeslot = $.trim($("#statistics_search_timeslot").val());
+	
+	if (cid == "") {
+		$.messager.show({title:'温馨提示',msg:'请选择班级...',timeout:3000, showType:'slide'});
+		return;
+	}
+	
+	$('#statistics_data').datagrid({
+		url:"../attendance",
+		queryParams:{op:"findByTotal", cid:cid, sdate:sdate, edate:edate, timeslot:timeslot},
+		onLoadSuccess:function(data) {
+			stu_statistics_info = data.stus;
+		}
+	});
+}
+
+var statistics_status=["","已到","迟到","旷课","病假","事假"];
+var statistics_time=["","上午","下午","晚上"];
+
+function findStatisticsBySid(id, name) {
+	var str="<tr>";
+	var count = 0;
+	$.each(stu_statistics_info, function(index, item) {
+		if (item.sid == id) {
+			count ++;
+			str += "<td>" + item.sdate+"</td><td>"+statistics_time[item.time]+"</td>";
+			if (item.status == 1) {
+				str += "<td style='color:green'>";
+			} else {
+				str += "<td style='color:red'>";
+			}
+			str += statistics_status[item.status] +"</td><td>"+item.remark+"</td>";
+			if (count%2==0) {
+				str += "</tr>";
+			}
+		}
+	});
+	if (count%2 != 0) {
+		str += "<td></td><td></td><td></td><td></td></tr>";
+	}
+	$("#statistics_dialog_detail").html("").append($(str));
+	
+	var statistics_dialog_obj = $('#statistics_dialog').dialog({
+		title: '考勤详细 - ' + name,
+		fit: true,
+		closed:false,
+		cache:false,
+		iconCls:"icon-chart-curve-link",
+		modal:true, 
+		buttons: [{
+			text: '关闭',
+			iconCls: 'icon-cancel',
+			handler: function () {
+				statistics_dialog_obj.dialog('close');                    
+			}
+       }]
+	}); 
+	statistics_dialog_obj.dialog("open");
+}
+
+</script>

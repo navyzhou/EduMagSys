@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.ClassInfoMapper">
+	<select id="findByStatus" resultType="ClassInfo" parameterType="Integer">
+		select cid, cname, tid, cdate, semester, edate, status, remark from classInfo where status=#{0} order by cid
+	</select>
+</mapper>

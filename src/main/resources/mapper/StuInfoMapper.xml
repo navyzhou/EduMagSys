@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.StuInfoMapper">
+	<select id="stuLogin" resultType="StuInfo" parameterType="AdminInfo">
+		select sid, sname, cid, tel, cardId, parentName, parentTel, photo, addr, cardPositive,  cardNegative, remark, spare1, spare1, 
+		status from stuInfo where sname=#{aname} and pwd=password(#{pwd}) and cid=#{status} and status!=0
+	</select>
+</mapper>

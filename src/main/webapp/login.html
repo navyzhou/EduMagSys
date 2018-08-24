@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+<meta http-equiv="Pragma" content="no-cache"> 
+<meta http-equiv="Cache-Control" content="no-cache"> 
+<meta http-equiv="Expires" content="0"> 
+<title>源辰信息科技有限公司-教务管理系统登录界面</title>
+<link rel="shortcut icon" type="image/x-icon" href="easyui/images/yc.png"/>
+<link href="css/login.css" type="text/css" rel="stylesheet"> 
+<script type="text/javascript" src="easyui/js/jquery-1.11.3.js"></script>
+<script type="text/javascript">
+$(function(){
+	$.getJSON("back/getLoginInfo",{},function(data) {
+		var str = "";
+		$.each(data.rf, function(index, item) {
+			str += "<option value='" + item.rid + "'>"+item.rname+"</option>";
+		});
+		$("#role").append($(str));
+		
+		var cfStr = ""
+		$.each(data.cf, function(index, item) {
+			cfStr += "<option value='" + item.cid + "'>"+item.cname+"</option>";
+		});
+		$("#cid").append($(cfStr));
+	});
+	
+	$("#myform input").focus(function(){
+		$(this).removeClass("navy_error");
+		$("#waring-info").text("");
+	})
+	
+	$("#pwd").keydown(function(e) {
+		if(e.keyCode == 13) {
+			userLogin();
+		}
+	});
+});
+
+function userLogin(){
+	var account = $.trim($("#username").val());
+	if (account == ""){
+		$("#username").addClass("navy_error");
+		return;
+	}
+	
+	var pwd = $.trim($("#pwd").val());
+	if (pwd == ""){
+		$("#pwd").addClass("navy_error");
+		return;
+	}
+	
+	var rname = $("#role option:selected").text();
+	var cid = $("#cid").val();
+	
+	$.post("back/userLogin",{rname:rname, status:cid, aname:account, pwd:pwd},function(data){
+		data = parseInt($.trim(data));
+		if (data ==1) {
+			$("#myform")[0].reset();
+			if (rname == "学员"){
+				//location.href="front/index.jsp";
+			} else {
+				location.href="back/index.jsp";
+			}
+		} else {
+			$("#waring-info").text("账号或密码错误，请确认后重新登录...");
+		}
+	},"text");
+}
+
+function showReg(txt){
+	var txt=$("#role option:selected").text();
+	
+	if( txt == '学员' ){
+		$("#cid").css("display","inline-block");
+	} else {
+		$("#cid").css("display","none");
+	}
+}
+</script>
+</head> 
+<body> 
+
+<div class="login">
+    <div class="message">教务管理系统-用户登录</div>
+    <div id="darkbannerwrap"></div>
+    <form id="myform">
+    	<select name="role" id="role" onchange="showReg(this.text)">
+    		
+    	</select>
+    	<hr class="hr15">
+		<select name="cid" id="cid" style="display:none">
+    		
+    	</select>
+		<hr class="hr15">
+		<input name="username" id="username" placeholder="请输入姓名" required type="text" autofocus="autofocus" value="navy">
+		<hr class="hr15">
+		<input name="password" id="pwd" placeholder="请输入密码" required type="password" value="123456">
+		<hr class="hr15">
+		<span id="waring-info" style="color:red"></span>
+		<hr class="hr15">
+		<input value="登录" style="width:100%;" type="button" onclick="userLogin()">
+		<hr class="hr20">
+	</form>
+	<div id="adminOp">
+		<a href="pwd.html">忘记密码</a>
+	</div>
+</div>
+
+<div class="copyright">衡阳市源辰信息科技有限公司 &copy; <a href="http://www.hyycinfo.com" target="_blank">在线考试系统</a></div>
+</body>
+</html>

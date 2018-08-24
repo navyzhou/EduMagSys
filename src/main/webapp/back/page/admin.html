@@ -1,0 +1,180 @@
+<table id="adminInfo_data" data-options="fit:true"></table>  
+
+<div id="adminInfo_search">
+	<a href="javascript:openAddAdminInfoRow()" class="easyui-linkbutton" data-options="iconCls:'icon-user-add',plain:true" style="float:left">添加</a> 
+	<div class="datagrid-btn-separator"></div>
+	<a href="javascript:openUpdateAdminInfoRow()" class="easyui-linkbutton" data-options="iconCls:'icon-user-edit',plain:true" style="float:left">修改</a> 
+	<div class="datagrid-btn-separator"></div>
+	<a href="javascript:saveAdminInfo()" class="easyui-linkbutton" data-options="iconCls:'icon-user-tick',plain:true" style="float:left">保存</a>  
+	<div class="datagrid-btn-separator"></div>	
+	<a href="javascript:undoAdminInfo()" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" style="float:left">撤销</a>  
+	<div class="datagrid-btn-separator"></div>	
+	<label for="adminInfo_search_aname">管理员姓名：</label>
+	<input id="adminInfo_search_aname" class="myipt" placeholder="请输入管理员姓名..."/>
+	<label class="mylabel">管理员角色：</label>
+	<select id="adminInfo_search_rid" class="myselect">
+		<option value="">--请选择--</option>
+	</select>
+	<label class="mylabel">管理员状态：</label>
+	<select id="adminInfo_search_status" class="myselect">
+		<option value="">--请选择--</option>
+		<option value="0">冻结</option>
+		<option value="1">正常</option>
+		<option value="2">休假</option>
+		<option value="3">离职</option>
+	</select>
+	<a href="javascript:searchAdminInfo()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</a> 
+</div>
+<script>
+var adminInfo_editRow = undefined;
+var adminInfo_Obj;
+var adminInfo_status_Obj=[{id:0,name:'冻结'},{id:1,name:'正常'},{id:2,name:'休假'},{id:3,name:'离职'}];
+var adminInfo_role_Obj;
+var adminInfo_flag;
+var adminInfo_op;
+
+
+$(function(){
+	$.getJSON("../roleInfo", {op:"findAll"}, function(data){
+		adminInfo_role_Obj = data;
+		createAdminInfoDatagrid();
+		var str ="";
+		$.each(data, function(index, item){
+			str += "<option value='" + item.rid + "'>" + item.rname + "</option>";		
+		});
+		$("#adminInfo_search_rid").append($(str));
+	});
+	
+});
+function createAdminInfoDatagrid() {
+	adminInfo_Obj = $('#adminInfo_data').datagrid({    
+	    url:'../adminInfo',
+	    queryParams:{op:"findByPage"},
+	    fitColumns:true,
+	    striped:true,
+	    nowrap:true,
+	    loadMsg:'数据加载中...',
+	    rownumbers:true,
+	    pagination:true,
+	    singleSelect:true,
+	    sortName:"aid",
+	    remoteSort:false,
+	    pageNumber:1,
+	    pageSize: 10,
+	    pageList:[5,10,20,30,40,50],
+	    columns:[[
+	        {checkbox:true},     
+	        {field:'aid',title:'管理员编号',width:80,align:'center',sortable:true},    
+	        {field:'photo',title:'管理员图像',width:100,align:'center',formatter:function(val, row, index){
+	        	if (val == "" || val == undefined) {
+	        		return "<img src='../images/user.png' />";
+	        	} else {
+	        		return "<img src='../" + val + "' width='100px' height='100px'/>";
+	        	}
+	        }},    
+	        {field:'aname',title:'管理员姓名',width:100,align:'center',editor:{type:"text",options:{required:true}}},    
+	        {field:'pwd',title:'管理员密码',width:150,align:'center',formatter:function(val, row, index){
+	        	return "********";
+	        }, editor:{type:"text",options:{required:true}}},    
+	        {field:'rid',title:'管理员角色',width:100,align:'center',formatter:function(val, row, index){
+	        	for (var i = 0,len = adminInfo_role_Obj.length; i < len; i++) {
+	        		if (val == adminInfo_role_Obj[i].rid) {
+	        			return adminInfo_role_Obj[i].rname;
+	        		}
+	        	}
+	        	
+	        },editor:{type:"combobox",options:{required:true,valueField:'rid',textField:'rname',data:adminInfo_role_Obj}}},    
+	        {field:'status',title:'管理员状态',width:60,align:'center',formatter:function(val, row, index){
+	        	for (var i = 0,len = adminInfo_status_Obj.length; i < len; i++) {
+	        		if (val == adminInfo_status_Obj[i].id) {
+	        			return adminInfo_status_Obj[i].name;
+	        		}
+	        	}
+	        	
+	        },editor:{type:"combobox",options:{required:true,valueField:'id',textField:'name',data:adminInfo_status_Obj}}},    
+	        {field:'remark',title:'管理员描述',width:100,align:'center',editor:{type:"text",options:{required:true}}}    
+	            
+	    ]],
+	    toolbar:"#adminInfo_search"
+	});  
+}
+
+function openAddAdminInfoRow() {
+	adminInfo_flag = "添加";
+	adminInfo_op = "add";
+	if (adminInfo_editRow == undefined) {
+		// 在表格中添加一行
+		adminInfo_Obj.datagrid("insertRow",{index:0, row:{}});
+		// 开始编辑哪一行
+		adminInfo_Obj.datagrid("beginEdit", 0);
+		
+		adminInfo_editRow = 0; // 记录当前正在被编辑的行的索引
+	}
+}
+
+function openUpdateAdminInfoRow() {
+	adminInfo_flag = "修改";
+	adminInfo_op = "update";
+	
+	if (adminInfo_editRow != undefined) { // 说你有正在被编辑的行
+		adminInfo_Obj.datagrid("beginEdit", adminInfo_editRow);
+		adminInfo_Obj.datagrid("rejectChanges"); // 回滚所有数据
+		adminInfo_Obj.datagrid("uncheckAll"); // 取消所有勾选
+		adminInfo_editRow = undefined
+	}
+	
+	var row = adminInfo_Obj.datagrid("getChecked")[0]; // 获取选中行
+	if (row == undefined) {
+		$.messager.show({title:'温馨提示',msg:'请勾选您要修改的数据...',timeout:3000,	showType:'slide'});
+	} else {
+		// 先获取用户选中的行的索引，然后开启编辑
+		adminInfo_editRow =  adminInfo_Obj.datagrid("getRowIndex", row);
+		adminInfo_Obj.datagrid("beginEdit", adminInfo_editRow);
+	}
+}
+
+function saveAdminInfo(){
+	if (adminInfo_editRow != undefined) {
+		// 结束编辑
+		adminInfo_Obj.datagrid("endEdit", adminInfo_editRow);
+		
+		// 获取用户编辑的所有数据行中的第一行
+		var row = adminInfo_Obj.datagrid("getChanges")[0];
+		row.op = adminInfo_op;
+		
+		if (row != undefined) {
+			$.post("../adminInfo", row, function(data){
+				data = parseInt($.trim(data));
+				if (data == -1) {
+					$.messager.show({title:'温馨提示',msg:'您输入的信息不完整，请重新操作...',timeout:3000,	showType:'slide'});
+				} else if (data > 0) {
+					$.messager.show({title:'成功提示',msg:'管理员信息' + adminInfo_flag + '成功...',timeout:3000, showType:'slide'});
+					adminInfo_Obj.datagrid("reload"); // 重新加载数据
+				} else {
+					$.messager.alert('失败提示','管理员信息' + adminInfo_flag + '失败，请稍后重试...','error');
+					adminInfo_Obj.datagrid("rejectChanges"); // 回滚所有数据
+				}
+			},"text");
+		}
+		adminInfo_editRow = undefined;
+		adminInfo_Obj.datagrid("uncheckAll");
+	}
+}
+
+function searchAdminInfo() {
+	var aname = $.trim($("#adminInfo_search_aname").val());
+	var rid = $.trim($("#adminInfo_search_rid").val());
+	var status = $.trim($("#adminInfo_search_status").val());
+	
+	$('#adminInfo_data').datagrid({
+		url:"../adminInfo",
+		queryParams:{op:"findByCondition", aname:aname, rid:rid, status:status}
+	});
+}
+
+function undoAdminInfo() {
+	adminInfo_Obj.datagrid("rejectChanges"); // 回滚所有数据
+	adminInfo_Obj.datagrid("uncheckAll"); // 取消所有勾选
+	adminInfo_editRow = undefined;
+}
+</script>
