@@ -22,7 +22,6 @@ import com.yc.edusys.biz.IStuInfoBiz;
 import com.yc.edusys.websocket.WebSocketServer;
 
 @RestController
-@RequestMapping("/back")
 public class LoginController extends BaseController {
 	@Autowired
 	@Qualifier("adminInfoBizImpl")
@@ -83,7 +82,7 @@ public class LoginController extends BaseController {
 		return result;
 	}
 	
-	@RequestMapping("/getLoginAdminId")
+	@RequestMapping("/back/getLoginAdminId")
 	public int getLoginAdminId(HttpSession session) {
 		Object obj = session.getAttribute("currentLoginUser");
 		if (obj == null) {

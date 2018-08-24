@@ -11,7 +11,7 @@
 <script type="text/javascript" src="easyui/js/jquery-1.11.3.js"></script>
 <script type="text/javascript">
 $(function(){
-	$.getJSON("back/getLoginInfo",{},function(data) {
+	$.getJSON("getLoginInfo",{},function(data) {
 		var str = "";
 		$.each(data.rf, function(index, item) {
 			str += "<option value='" + item.rid + "'>"+item.rname+"</option>";
@@ -53,7 +53,7 @@ function userLogin(){
 	var rname = $("#role option:selected").text();
 	var cid = $("#cid").val();
 	
-	$.post("back/userLogin",{rname:rname, status:cid, aname:account, pwd:pwd},function(data){
+	$.post("userLogin",{rname:rname, status:cid, aname:account, pwd:pwd},function(data){
 		data = parseInt($.trim(data));
 		if (data ==1) {
 			$("#myform")[0].reset();

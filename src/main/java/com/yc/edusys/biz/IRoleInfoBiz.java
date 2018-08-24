@@ -3,6 +3,7 @@ package com.yc.edusys.biz;
 import java.util.List;
 import java.util.Map;
 
+import com.yc.edusys.bean.JsonObject;
 import com.yc.edusys.bean.RoleInfo;
 
 /**
@@ -39,7 +40,9 @@ public interface IRoleInfoBiz {
 	 * @param rows 每页多少条
 	 * @return 满足条件的角色信息
 	 */
-	public Map<String, Object> findByPage(int page, int rows);
+	public JsonObject findByPage(Map<String,Integer> map);
+	
+	public List<RoleInfo> findByPageInfo(Map<String,Integer> map);
 	
 	/**
 	 * 获取角色信息的总记录数

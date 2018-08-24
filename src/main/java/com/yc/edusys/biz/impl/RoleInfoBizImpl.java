@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.yc.edusys.bean.JsonObject;
 import com.yc.edusys.bean.RoleInfo;
 import com.yc.edusys.biz.IRoleInfoBiz;
 import com.yc.edusys.dao.IBaseDao;
@@ -40,11 +41,15 @@ public class RoleInfoBizImpl implements IRoleInfoBiz{
 	}
 
 	@Override
-	public Map<String, Object> findByPage(int page, int rows) {
-		// TODO Auto-generated method stub
-		return null;
+	public JsonObject findByPage(Map<String, Integer> map) {
+		return (JsonObject) baseDao.find(RoleInfo.class,"findByPage", map);
 	}
-
+	
+	@Override
+	public List<RoleInfo> findByPageInfo(Map<String,Integer> map) {
+		return baseDao.findAll(RoleInfo.class,"findByPageInfo", map);
+	}
+	
 	@Override
 	public int getTotal() {
 		// TODO Auto-generated method stub

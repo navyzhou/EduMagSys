@@ -18,5 +18,8 @@ public class RoleInfoController extends BaseController{
 		return this.toJson(roleInfoBiz.findAll());
 	}
 	
-	
+	@RequestMapping("/back/findRoleInfoByPage")
+	public String findRoleInfoByPage(int page, int rows) {
+		return this.toJson( roleInfoBiz.findByPage(this.toPageInfo(page, rows)) );
+	}
 }

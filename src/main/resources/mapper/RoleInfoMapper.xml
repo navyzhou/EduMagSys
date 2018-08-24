@@ -6,4 +6,18 @@
 	<select id="findAll" resultType="RoleInfo">
 		select rid, rname, remark from roleInfo order by rid
 	</select>
+	
+	<select id="findByPageInfo" resultType="RoleInfo" parameterType="Map">
+		select rid, rname, remark from roleInfo order by rid limit #{pageNo}, #{pageSize}
+	</select>
+	
+	<select id="findByPage" resultMap="roleInfoByJson" parameterType="Map">
+		select count(1) total, (#{page}-1)*#{rows} pageNo, #{rows} pageSize from roleInfo
+	</select>
+	
+	<resultMap type="JsonObject" id="roleInfoByJson" autoMapping="true">
+		<result column="pageNo" property="pageNo" />
+		<result column="pageSize" property="pageSize" />
+		<collection property="rows" column="{pageNo=pageNo,pageSize=pageSize}" ofType="RoleInfo" select="findByPageInfo" />
+	</resultMap>
 </mapper>
