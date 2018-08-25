@@ -38,10 +38,4 @@ public interface IRoleInfoBiz {
 	public JsonObject findByPage(Map<String,Integer> map);
 	
 	public List<RoleInfo> findByPageInfo(Map<String,Integer> map);
-	
-	/**
-	 * 获取角色信息的总记录数
-	 * @return 角色信息总记录条数
-	 */
-	public int getTotal();
 }

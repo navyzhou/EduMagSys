@@ -54,10 +54,4 @@ public class RoleInfoBizImpl implements IRoleInfoBiz{
 	public List<RoleInfo> findByPageInfo(Map<String,Integer> map) {
 		return baseDao.findAll(RoleInfo.class,"findByPageInfo", map);
 	}
-	
-	@Override
-	public int getTotal() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 }

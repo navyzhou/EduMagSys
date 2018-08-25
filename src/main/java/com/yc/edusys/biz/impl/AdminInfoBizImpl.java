@@ -101,17 +101,4 @@ public class AdminInfoBizImpl implements IAdminInfoBiz{
 		map.put("rows", admins);
 		return map;
 	}
-
-	@Override
-	public int getTotal() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getTotal(String rid, String status, String sname) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 }

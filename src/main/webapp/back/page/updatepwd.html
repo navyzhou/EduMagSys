@@ -1,0 +1,70 @@
+<div class="navy_update_pwd">
+	<ul>
+		<li><label for="update_oldpwd">原密码：</label><input type="password" id="update_oldpwd" class="navy_input" placeholder="请输入原密码" /></li>
+		<li><label for="update_newpwd">新密码：</label><input type="password" id="update_newpwd" class="navy_input" placeholder="请输入新密码" /></li>
+		<li><label for="update_againpwd">确认密码：</label><input type="password" id="update_againpwd" class="navy_input" placeholder="请再次输入新密码" /></li>
+		<li id="update_pwd_error"><span></span></li>
+		<li style="text-align: center"><a href="javascript:updatepwd_pwd()" class="easyui-linkbutton" data-options="iconCls:'icon-lock-key'">提交</a>
+			<a href="javascript:updatepwd_reset()" class="easyui-linkbutton" data-options="iconCls:'icon-key-stop'">重置</a></li>
+	</ul>
+</div>
+
+<script>
+$(function() {
+	$(".navy_update_pwd .navy_input").focus(function() {
+		$("#update_pwd_error").css("display", "none");
+		$("#update_pwd_error>span").eq(0).text("");
+	});
+});
+
+function updatepwd_reset() {
+	$("#update_oldpwd").val("");
+	$("#update_newpwd").val("");
+	$("#update_againpwd").val("");
+}
+
+function updatepwd_pwd() {
+	var oldpwd = $("#update_oldpwd").val();
+
+	if (oldpwd == "") {
+		$("#update_pwd_error").css("display", "block");
+		$("#update_pwd_error>span").eq(0).text("请输入新密码...");
+		return;
+	}
+
+	var newpwd = $("#update_newpwd").val();
+	if (newpwd == "") {
+		$("#update_pwd_error").css("display", "block");
+		$("#update_pwd_error>span").eq(0).text("请输入原密码...");
+		return;
+	}
+
+	var againpwd = $("#update_againpwd").val();
+	if (againpwd != newpwd) {
+		$("#update_pwd_error").css("display", "block");
+		$("#update_pwd_error>span").eq(0).text("两次密码输入不一致，请重新输入...");
+		return;
+	}
+	
+	$.post("../back/updateAdminPwd",{oldpwd:oldpwd, newpwd:newpwd},function(data) {
+		data = parseInt( $.trim(data) );
+		
+		if (data == 0){
+			$.messager.alert('温馨提示','请先登录...','error');
+			location.href="../login.html";
+		} else if (data == 1){
+			$("#update_pwd_error").css("display", "block");
+			$("#update_pwd_error>span").eq(0).text("您输入的信息不完整，请完善后再提交...");
+		}  else if (data == 2){
+			$("#update_oldpwd").val("");
+			$("#update_newpwd").val("");
+			$("#update_againpwd").val("");
+			$.messager.show({title:'成功提示',msg:'密码修改成功...',timeout:3000,showType:'slide'});
+		}  else {
+			$("#update_pwd_error").css("display", "block");
+			$("#update_pwd_error>span").eq(0).text("旧密码错误，请重新输入...");
+		} 
+	},"text");
+	
+}
+</script>

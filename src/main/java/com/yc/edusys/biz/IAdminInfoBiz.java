@@ -67,18 +67,4 @@ public interface IAdminInfoBiz {
 	 * @return 满足条件的管理员信息
 	 */
 	public Map<String, Object> findByCondition(int page, int rows, String rid, String status, String aname);
-	
-	/**
-	 * 获取管理员信息的总记录数
-	 * @return 管理员信息总记录条数
-	 */
-	public int getTotal();
-	
-	/**
-	 * 多条件组合统计
-	 * @param rid 管理员角色
-	 * @param status 管理员状态
-	 * @return 满足条件的管理员记录数
-	 */
-	public int getTotal(String rid, String status, String sname);
 }
