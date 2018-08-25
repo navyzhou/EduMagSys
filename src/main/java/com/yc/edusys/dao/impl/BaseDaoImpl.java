@@ -31,7 +31,7 @@ public class BaseDaoImpl<T> extends SqlSessionDaoSupport implements IBaseDao<T>{
 	}
 
 	@Override
-	public List<T> findAll(Class<?> c, Map<String, Object> map, String sqlId) {
+	public List<T> findAll(Class<?> c, String sqlId, Map<String, Object> map) {
 		return super.getSqlSession().selectList(getMapperId(c, sqlId),map);
 	}
 
@@ -41,7 +41,7 @@ public class BaseDaoImpl<T> extends SqlSessionDaoSupport implements IBaseDao<T>{
 	}
 
 	@Override
-	public T find(Class<?> c, Map<String, Object> map, String sqlId) {
+	public T find(Class<?> c, String sqlId, Map<String, Object> map) {
 		return super.getSqlSession().selectOne(getMapperId(c, sqlId),map);
 	}
 
@@ -56,32 +56,32 @@ public class BaseDaoImpl<T> extends SqlSessionDaoSupport implements IBaseDao<T>{
 	}
 
 	@Override
-	public Integer add(Class<?> c, Map<String, Object> map, String sqlId) {
+	public Integer add(Class<?> c, String sqlId, Map<String, Object> map) {
 		return super.getSqlSession().insert(getMapperId(c, sqlId),map);
 	}
 
 	@Override
-	public Integer add(Class<?> c, Object obj, String sqlId) {
+	public Integer add(Class<?> c, String sqlId, Object obj) {
 		return super.getSqlSession().insert(getMapperId(c, sqlId),obj);
 	}
 
 	@Override
-	public Integer delete(Class<?> c, Map<String, Object> map, String sqlId) {
+	public Integer delete(Class<?> c, String sqlId, Map<String, Object> map) {
 		return super.getSqlSession().delete(getMapperId(c, sqlId),map);
 	}
 
 	@Override
-	public Integer delete(Class<?> c, Object obj, String sqlId) {
+	public Integer delete(Class<?> c, String sqlId, Object obj) {
 		return super.getSqlSession().delete(getMapperId(c, sqlId),obj);
 	}
 
 	@Override
-	public Integer update(Class<?> c, Map<String, Object> map, String sqlId) {
+	public Integer update(Class<?> c, String sqlId, Map<String, Object> map) {
 		return super.getSqlSession().update(getMapperId(c, sqlId),map);
 	}
 
 	@Override
-	public Integer update(Class<?> c, Object obj, String sqlId) {
+	public Integer update(Class<?> c, String sqlId, Object obj) {
 		return super.getSqlSession().update(getMapperId(c, sqlId),obj);
 	}
 
@@ -91,12 +91,27 @@ public class BaseDaoImpl<T> extends SqlSessionDaoSupport implements IBaseDao<T>{
 	}
 
 	@Override
-	public Double findFunc(Class<?> c, Map<String, Object> map, String sqlId) {
+	public Double findFunc(Class<?> c, String sqlId, Map<String, Object> map) {
 		return super.getSqlSession().selectOne(getMapperId(c, sqlId),map);
 	}
 
 	@Override
-	public Double findFunc(Class<?> c, Object obj, String sqlId) {
+	public Double findFunc(Class<?> c, String sqlId, Object obj) {
 		return super.getSqlSession().selectOne(getMapperId(c, sqlId),obj);
+	}
+
+	@Override
+	public Integer getTotal(Class<?> c, String sqlId) {
+		return super.getSqlSession().selectOne(getMapperId(c, sqlId));
+	}
+
+	@Override
+	public Integer getTotal(Class<?> c, String sqlId, Object obj) {
+		return super.getSqlSession().selectOne(getMapperId(c, sqlId),obj);
+	}
+
+	@Override
+	public Integer getTotal(Class<?> c, String sqlId, Map<String, Object> map) {
+		return super.getSqlSession().selectOne(getMapperId(c, sqlId),map);
 	}
 }

@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,6 +17,8 @@
 <script type="text/javascript" src="../js/ajaxfileupload.js"></script>
 <script type="text/javascript" src="../js/showpic.js"></script>
 <script type="text/javascript" src="../js/websocket.js"></script>
+
+<script type="text/javascript" src="../js/cropbox.js"></script>
 <script type="text/javascript">
 $(function(){
 	$.get("../back/getLoginAdminId",{},function(data){
@@ -36,11 +39,16 @@ $(function(){
         	<h1>衡阳市源辰信息科技有限公司-教务管理系统</h1>
         </div>
         <div class="wu-header-center">
-        	<img src="../images/user.png"  id="adminPhoto"/>
+        	<c:if test="${not empty currentLoginUser.photo}">
+        		<img src = "../../../${currentLoginUser.photo}"  id="adminPhoto" onclick="changeAdminPhoto()"/>
+        	</c:if>
+        	<c:if test="${empty currentLoginUser.photo}">
+        		<img src="../images/user.png"  id="adminPhoto" onclick="changeAdminPhoto()"/>
+        	</c:if>
         </div>
         <div class="wu-header-right">
         	<p><strong class="easyui-tooltip">${currentLoginUser.aname }</strong>，欢迎您！</p>
-            <p><a href="#">帮助中心</a>|<a href="">安全退出</a></p>
+            <p><a href="#">帮助中心</a>|<a href="javascript:admingSignOut()">安全退出</a></p>
         </div>
     </div>
     <!-- end of header -->
@@ -72,9 +80,9 @@ $(function(){
             
             <div title="个人信息" data-options="iconCls:'icon-wrench'" style="padding:5px;">  	
     			<ul class="easyui-tree wu-side-tree">
-                    <li iconCls="icon-tick"><a href="javascript:void(0)" data-icon="icon-cog" data-link="temp/layout-3.html" iframe="0">修改密码</a></li>
+                    <li iconCls="icon-tick"><a href="javascript:void(0)" data-icon="icon-cog" data-link="page/updatepwd.html" iframe="0">修改密码</a></li>
                     <li iconCls="icon-cog"><a href="javascript:void(0)" data-icon="icon-cog" data-link="temp/layout-3.html" iframe="0">修改信息</a></li>
-                    <li iconCls="icon-cog"><a href="javascript:void(0)" data-icon="icon-cog" data-link="temp/layout-3.html" iframe="0">安全退出</a></li>
+                    <li iconCls="icon-door-out"><a href="javascript:admingSignOut()" data-icon="icon-door-out" iframe="0">安全退出</a></li>
                 </ul>
             </div>
         </div>
@@ -92,6 +100,28 @@ $(function(){
     	<a href="http://www.hyycinfo.com">衡阳市源辰信息科技有限公司 &copy; 版权所有</a>
     </div>
     <!-- end of footer -->  
+<video id="video" autoplay width="400px" height="468px"></video>
+<div id="index_showphotoDiv">
+	<img src="../images/close.jpg" onclick=" $('#index_showphotoDiv').css('display','none') "/>
+	<div class="container">
+		<div class="imageBox" id="imageBox">
+			<div class="thumbBox"></div>
+			<div class="spinner" style="display: none">Loading...</div>
+		</div>
+		<div class="action">
+			<div class="new-contentarea tc">
+				<a href="javascript:void(0)" class="upload-img"> <label for="upload-file">本地上传</label> </a> <input type="file" class="" name="upload-file" id="upload-file" />
+			</div>
+			<input type="button" class="Btnsty_peyton" value="保存" onclick="uploadAdminHead()">
+			<input type="button" id="btnCrop" class="Btnsty_peyton" value="裁切">
+			<input type="button" id="btnZoomIn" class="Btnsty_peyton" value="+">
+			<input type="button" id="btnZoomOut" class="Btnsty_peyton" value="-">
+			<input id="snap" type="button" class="Btnsty_peyton" value="拍照"/>
+			<input type="button" id="openVideo" class="Btnsty_peyton" value="打开摄像头" style="width:120px">
+		</div>
+		<div class="cropped"></div>
+	</div>
+</div>   
     
 <script type="text/javascript">
 $(function(){
@@ -165,6 +195,115 @@ function removeTab(){
 		var index = tabPanel.tabs('getTabIndex', tab);
 		tabPanel.tabs('close', index);
 	}
+}
+
+function changeAdminPhoto() { // 修改用户图像
+	$("#index_showphotoDiv").css("display","block");
+}
+
+
+var options ={thumbBox : '.thumbBox',spinner : '.spinner',imgSrc : '../images/head.jpg'};
+var cropper = $('.imageBox').cropbox(options);
+$('#upload-file').on('change', function() {
+	var reader = new FileReader();
+	reader.onload = function(e) {
+		options.imgSrc = e.target.result;
+		cropper = $('.imageBox').cropbox(options);
+	}
+	reader.readAsDataURL(this.files[0]);
+	this.files = [];
+});
+
+$('#btnCrop').on('click',function() {
+	var img = cropper.getDataURL();
+	$('.cropped').html('');
+	$('.cropped').append('<img id="headinfo1" src="'+img+'" align="absmiddle" style="width:64px;margin-top:4px;border-radius:64px;box-shadow:0px 0px 12px #7E7E7E;" ><p>64px*64px</p>');
+	$('.cropped').append('<img id="headinfo2" src="'+img+'" align="absmiddle" style="width:128px;margin-top:4px;border-radius:128px;box-shadow:0px 0px 12px #7E7E7E;"><p>128px*128px</p>');
+	$('.cropped').append('<img id="headinfo3" src="'+img+'" align="absmiddle" style="width:180px;margin-top:4px;border-radius:180px;box-shadow:0px 0px 12px #7E7E7E;"><p>180px*180px</p>');
+});
+
+$('#btnZoomIn').on('click', function() {
+	cropper.zoomIn();
+});
+
+$('#btnZoomOut').on('click', function() {
+	cropper.zoomOut();
+});
+
+
+
+var openVideo=document.getElementById("openVideo");//获得一个打开视屏按钮的对象；
+//getContext方法创建一个在画布上绘图的环境，它里面的参数指定了你要绘制的图形的类型；
+var video=document.getElementById("video");
+
+var canvas = document.createElement("canvas");
+var context = canvas.getContext("2d");
+
+
+openVideo.addEventListener("click",function(){
+	$("#video").css("display","block");
+	
+	// 新版本方法
+	if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false
+        }).then(function(stream) {
+            mediaStreamTrack = typeof stream.stop === 'function' ? stream : stream.getTracks()[1];
+
+            video.src = (window.URL || window.webkitURL).createObjectURL(stream);
+            video.play();
+        })
+    }
+});
+
+video.addEventListener("canplay", function () {  
+    canvas.width = videoWidth =$("#imageBox").width();  
+    canvas.height = videoHeight = $("#imageBox").height();  
+    context.fillStyle = '#ffffff';  
+   	context.fillRect(0, 0, videoWidth, videoWidth);  
+    //context.fillRect(0, 0, videoWidth, videoHeight);  
+    video.removeEventListener("canplay", arguments.callee);  
+ });  
+
+// 点击拍照
+document.getElementById("snap").addEventListener("click", function() {
+	//context.drawImage(video, 0, 0, 400, 400);
+	context.drawImage(video, 0, 0,$("#imageBox").height(), $("#imageBox").width());
+	//context.drawImage(video, 0, 0,$("#imageBox").width(), $("#imageBox").height());
+	var dataUrl = canvas.toDataURL("image/png");
+	$("#imageBox").css("background-image","url("+dataUrl+")");
+	options.imgSrc=dataUrl;
+	cropper = $('#imageBox').cropbox(options);
+	mediaStreamTrack && mediaStreamTrack.stop(); // 关闭摄像头
+	$("#video").css("display","none");
+});
+
+function uploadAdminHead(){
+	var pic = $("#headinfo2").attr("src");
+	pic = pic.replace(/^data:image\/(png|jpg);base64,/, "");
+	$.post("../back/updateAdminHead", {imageData:pic}, function(data){
+		data = $.trim(data);
+		if (data == "0") {
+			$.messager.alert('温馨提示','请先登录...','error');
+			location.href="../login.html";
+		} else if (data == "1") {
+			$.messager.alert('失败提示','头像上传失败，请稍后重试...','error');
+		} else if (data == "2") {
+			$.messager.alert('错误提示','头像修改，请稍后重试...','error');
+		} else {
+			$.messager.show({title:'成功提示',msg:'图像修改成功...',timeout:3000,showType:'slide'});
+			$("#adminPhoto").attr("src","../../../"+data);
+			$("#index_showphotoDiv").css("display","none");
+		}
+			
+	},"text");
+}
+
+function admingSignOut() {
+	$.get("../back/admingSignOut", {}, function(data) {
+		location.href="../login.html";
+	});
 }
 </script>
 </body>

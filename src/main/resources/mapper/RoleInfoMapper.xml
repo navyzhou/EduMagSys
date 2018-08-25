@@ -20,4 +20,12 @@
 		<result column="pageSize" property="pageSize" />
 		<collection property="rows" column="{pageNo=pageNo,pageSize=pageSize}" ofType="RoleInfo" select="findByPageInfo" />
 	</resultMap>
+	
+	<insert id="addRole" parameterType="RoleInfo">
+		insert into roleInfo values(0, #{rname}, #{remark})
+	</insert>
+	
+	<update id="updateRole" parameterType="RoleInfo">
+		update roleInfo set rname=#{rname}, remark=#{remark} where rid=#{rid}
+	</update>
 </mapper>

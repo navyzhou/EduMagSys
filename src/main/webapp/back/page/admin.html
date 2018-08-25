@@ -35,7 +35,7 @@ var adminInfo_op;
 
 
 $(function(){
-	$.getJSON("../roleInfo", {op:"findAll"}, function(data){
+	$.getJSON("../back/findAllRoleInfo", {}, function(data){
 		adminInfo_role_Obj = data;
 		createAdminInfoDatagrid();
 		var str ="";
@@ -48,8 +48,7 @@ $(function(){
 });
 function createAdminInfoDatagrid() {
 	adminInfo_Obj = $('#adminInfo_data').datagrid({    
-	    url:'../adminInfo',
-	    queryParams:{op:"findByPage"},
+	    url:'../back/findAdminInfoByPage',
 	    fitColumns:true,
 	    striped:true,
 	    nowrap:true,
@@ -101,7 +100,7 @@ function createAdminInfoDatagrid() {
 
 function openAddAdminInfoRow() {
 	adminInfo_flag = "添加";
-	adminInfo_op = "add";
+	adminInfo_op = "../back/addAdmin";
 	if (adminInfo_editRow == undefined) {
 		// 在表格中添加一行
 		adminInfo_Obj.datagrid("insertRow",{index:0, row:{}});
@@ -114,7 +113,7 @@ function openAddAdminInfoRow() {
 
 function openUpdateAdminInfoRow() {
 	adminInfo_flag = "修改";
-	adminInfo_op = "update";
+	adminInfo_op = "../back/updateAdmin";
 	
 	if (adminInfo_editRow != undefined) { // 说你有正在被编辑的行
 		adminInfo_Obj.datagrid("beginEdit", adminInfo_editRow);
@@ -140,10 +139,9 @@ function saveAdminInfo(){
 		
 		// 获取用户编辑的所有数据行中的第一行
 		var row = adminInfo_Obj.datagrid("getChanges")[0];
-		row.op = adminInfo_op;
 		
 		if (row != undefined) {
-			$.post("../adminInfo", row, function(data){
+			$.post(adminInfo_op, row, function(data){
 				data = parseInt($.trim(data));
 				if (data == -1) {
 					$.messager.show({title:'温馨提示',msg:'您输入的信息不完整，请重新操作...',timeout:3000,	showType:'slide'});
@@ -167,8 +165,8 @@ function searchAdminInfo() {
 	var status = $.trim($("#adminInfo_search_status").val());
 	
 	$('#adminInfo_data').datagrid({
-		url:"../adminInfo",
-		queryParams:{op:"findByCondition", aname:aname, rid:rid, status:status}
+		url:"../back/findAdminByCondition",
+		queryParams:{aname:aname, rid:rid, status:status}
 	});
 }
 

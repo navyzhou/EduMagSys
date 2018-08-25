@@ -19,6 +19,7 @@ import com.yc.edusys.biz.IAdminInfoBiz;
 import com.yc.edusys.biz.IClassInfoBiz;
 import com.yc.edusys.biz.IRoleInfoBiz;
 import com.yc.edusys.biz.IStuInfoBiz;
+import com.yc.edusys.util.SessionAttributeKey;
 import com.yc.edusys.websocket.WebSocketServer;
 
 @RestController
@@ -62,7 +63,7 @@ public class LoginController extends BaseController {
 			StuInfo stuInfo = stuInfoBiz.stuLogin(admin);
 			if (stuInfo != null) {
 				result = 1;
-				session.setAttribute("currentLoginUser", stuInfo);
+				session.setAttribute(SessionAttributeKey.CURRENTLOGINUSER, stuInfo);
 			}
 		} else { // 管理员登录
 			AdminInfo adminInfo = adminInfoBiz.adminLogin(admin);
@@ -76,7 +77,7 @@ public class LoginController extends BaseController {
 					}
 				}
 				result = 1;
-				session.setAttribute("currentLoginUser", adminInfo);
+				session.setAttribute(SessionAttributeKey.CURRENTLOGINUSER, adminInfo);
 			}
 		}
 		return result;
@@ -84,7 +85,7 @@ public class LoginController extends BaseController {
 	
 	@RequestMapping("/back/getLoginAdminId")
 	public int getLoginAdminId(HttpSession session) {
-		Object obj = session.getAttribute("currentLoginUser");
+		Object obj = session.getAttribute(SessionAttributeKey.CURRENTLOGINUSER);
 		if (obj == null) {
 			return -1;
 		} 

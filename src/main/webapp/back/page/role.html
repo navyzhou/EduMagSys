@@ -30,7 +30,7 @@ var role_Obj = $('#role_data').datagrid({
 		iconCls: 'icon-joystick-add',
 		handler: function(){
 			role_flag = "添加";
-			role_op = "add";
+			role_op = "../back/addRole";
 			
 			if (role_editRow == undefined) {
 				// 在表格中添加一行
@@ -46,7 +46,7 @@ var role_Obj = $('#role_data').datagrid({
 		iconCls: 'icon-joystick-connect',
 		handler: function(){
 			role_flag = "修改";
-			role_op = "update";
+			role_op = "../back/updateRole";
 			
 			if (role_editRow != undefined) { // 说你有正在被编辑的行
 				role_Obj.datagrid("beginEdit", role_editRow);
@@ -74,10 +74,9 @@ var role_Obj = $('#role_data').datagrid({
 				
 				// 获取用户编辑的所有数据行中的第一行
 				var row = role_Obj.datagrid("getChanges")[0];
-				row.op = role_op;
 				
 				if (row != undefined) {
-					$.post("../roleInfo", row, function(data){
+					$.post(role_op, row, function(data){
 						data = parseInt($.trim(data));
 						if (data == -1) {
 							$.messager.show({title:'温馨提示',msg:'角色名称不能为空...',timeout:3000,	showType:'slide'});

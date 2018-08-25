@@ -13,20 +13,15 @@ import com.yc.edusys.bean.RoleInfo;
 public interface IRoleInfoBiz {
 	/**
 	 * 添加角色信息 
-	 * @param rname 角色名称
-	 * @param remark 角色备注
 	 * @return 成功返回大于0的数
 	 */
-	public int add(String rname, String remark) ;
+	public int add(RoleInfo rf) ;
 
 	/**
 	 * 修改角色信息
-	 * @param rname 角色名称
-	 * @param remark 角色备注
-	 * @param rid 要修改的角色编号
 	 * @return 成功返回大于0的数
 	 */
-	public int update(String rname, String remark, String rid);
+	public int update(RoleInfo rf);
 
 	/**
 	 * 查询所有角色信息

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.yc.edusys.bean.RoleInfo;
 import com.yc.edusys.biz.IRoleInfoBiz;
 
 @RestController
@@ -21,5 +22,15 @@ public class RoleInfoController extends BaseController{
 	@RequestMapping("/back/findRoleInfoByPage")
 	public String findRoleInfoByPage(int page, int rows) {
 		return this.toJson( roleInfoBiz.findByPage(this.toPageInfo(page, rows)) );
+	}
+	
+	@RequestMapping("/back/addRole")
+	public int addRole(RoleInfo rf) {
+		return roleInfoBiz.add(rf);
+	}
+	
+	@RequestMapping("/back/updateRole")
+	public int updateRole(RoleInfo rf) {
+		return roleInfoBiz.update(rf);
 	}
 }

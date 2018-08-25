@@ -11,6 +11,7 @@ import com.yc.edusys.bean.JsonObject;
 import com.yc.edusys.bean.RoleInfo;
 import com.yc.edusys.biz.IRoleInfoBiz;
 import com.yc.edusys.dao.IBaseDao;
+import com.yc.edusys.util.StringUtil;
 
 /**
  * 角色信息业务模型层的实现
@@ -24,15 +25,19 @@ public class RoleInfoBizImpl implements IRoleInfoBiz{
 	private IBaseDao baseDao;
 	
 	@Override
-	public int add(String rname, String remark) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int add(RoleInfo rf) {
+		if (rf == null || StringUtil.isNull(rf.getRname())) {
+			return -1;
+		}
+		return baseDao.update(RoleInfo.class, "addRole", rf);
 	}
 
 	@Override
-	public int update(String rname, String remark, String rid) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int update(RoleInfo rf) {
+		if (rf == null || StringUtil.isNull(rf.getRname())) {
+			return -1;
+		}
+		return baseDao.update(RoleInfo.class, "updateRole", rf);
 	}
 
 	@Override
