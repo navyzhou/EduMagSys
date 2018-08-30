@@ -1,11 +1,9 @@
-function openWebSocket(sid) {
+function openWebSocket(sid) { // sid为当前登录用户的id
 	var socket;
 	if(typeof(WebSocket) == undefined) {
 		console.log("您的浏览器不支持WebSocket");
 	}else{
 		//实现化WebSocket对象，指定要连接的服务器地址与端口  建立连接
-		//socket = new WebSocket("ws://localhost:9094/starManager/websocket/张三"
-
 		socket = new WebSocket("ws://127.0.0.1:8080/EduMagSys/websocket/"+sid);
 
 		//打开事件

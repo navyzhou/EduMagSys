@@ -4,7 +4,7 @@
 
 <mapper namespace="mapper.AdminInfoMapper">
 	<select id="adminLogin" resultType="AdminInfo" parameterType="AdminInfo">
-		select aid, aname, pwd, a.rid, rname, photo, a.remark, status from adminInfo a, roleInfo r where a.rid = r.rid and aname=#{aname} and pwd=password(#{pwd}) and status=1
+		select aid, aname, pwd, a.rid, photo, a.remark, status from adminInfo a where aname=#{aname} and pwd=password(#{pwd}) and status=1
 	</select>
 	
 	<insert id="addAdmin" parameterType="AdminInfo">

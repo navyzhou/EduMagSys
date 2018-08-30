@@ -19,7 +19,6 @@ import com.yc.edusys.biz.IAdminInfoBiz;
 import com.yc.edusys.util.LogUtil;
 import com.yc.edusys.util.SessionAttributeKey;
 import com.yc.edusys.util.StringUtil;
-
 import sun.misc.BASE64Decoder;
 
 @RestController
