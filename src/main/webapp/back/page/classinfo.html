@@ -36,7 +36,7 @@ var classInfo_flag;
 var classInfo_op;
 
 $(function(){
-	$.getJSON("../trainInfo", {op:"findAll"}, function(data){
+	$.getJSON("trainInfo/findAll", {}, function(data){
 		classInfo_train_Obj = data;
 		createClassInfoDatagrid();
 		var str ="";
@@ -49,8 +49,7 @@ $(function(){
 });
 function createClassInfoDatagrid() {
 	classInfo_Obj=$('#classInfo_data').datagrid({    
-	    url:'../classInfo',
-	    queryParams:{op:"findByPage"},
+	    url:'classInfo/findByPage',
 	    fitColumns:true,
 	    striped:true,
 	    nowrap:true,

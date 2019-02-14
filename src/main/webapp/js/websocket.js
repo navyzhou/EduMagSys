@@ -30,7 +30,7 @@ function openWebSocket(sid) { // sid为当前登录用户的id
 
 		//发生了错误事件
 		socket.onerror = function() {
-			alert("Socket发生了错误");
+			alert("服务器已掉线");
 		};
 
 		$(window).unload(function(){

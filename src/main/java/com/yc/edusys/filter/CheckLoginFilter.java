@@ -20,6 +20,7 @@ import com.yc.edusys.util.SessionAttributeKey;
 @WebFilter(filterName="CheckLoginFilter",value="/back/*",initParams=@WebInitParam(name="errorPage",value="login.html"))
 public class CheckLoginFilter implements Filter{
 	private String path = "index.html";
+	
 	@Override
 	public void destroy() {
 		

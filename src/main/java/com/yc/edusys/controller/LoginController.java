@@ -19,6 +19,7 @@ import com.yc.edusys.biz.IAdminInfoBiz;
 import com.yc.edusys.biz.IClassInfoBiz;
 import com.yc.edusys.biz.IRoleInfoBiz;
 import com.yc.edusys.biz.IStuInfoBiz;
+import com.yc.edusys.util.RedisUtils;
 import com.yc.edusys.util.SessionAttributeKey;
 import com.yc.edusys.websocket.WebSocketServer;
 
@@ -39,6 +40,9 @@ public class LoginController extends BaseController {
 	@Autowired
 	@Qualifier("stuInfoBizImpl")
 	private IStuInfoBiz stuInfoBiz;
+	
+	@Autowired
+	private RedisUtils redisUtils;
 	
 	/**
 	 * 获取登录页面的角色信息和班级信息

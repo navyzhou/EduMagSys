@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.yc.edusys.bean.ClassInfo;
+import com.yc.edusys.bean.JsonObject;
 
 public interface IClassInfoBiz{
 	/**
@@ -35,7 +36,7 @@ public interface IClassInfoBiz{
 	 * @param row
 	 * @return
 	 */
-	public Map<String, Object> findByPage(int page, int row);
+	public JsonObject findByPage(Map<String, Integer> map);
 	
 	/**
 	 * 多条件组合查询

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.yc.edusys.bean.ClassInfo;
+import com.yc.edusys.bean.JsonObject;
 import com.yc.edusys.biz.IClassInfoBiz;
 import com.yc.edusys.dao.IBaseDao;
 
@@ -35,8 +36,8 @@ public class ClassInfoBizImpl implements IClassInfoBiz{
 	}
 
 	@Override
-	public Map<String, Object> findByPage(int page, int row) {
-		return null;
+	public JsonObject findByPage(Map<String, Integer> map) {
+		return (JsonObject) baseDao.find(ClassInfo.class, "findByPage", map);
 	}
 
 	@Override

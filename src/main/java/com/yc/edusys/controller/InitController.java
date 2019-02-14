@@ -1,24 +1,34 @@
 package com.yc.edusys.controller;
 
 import java.io.File;
+import java.util.Arrays;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 
-//@WebServlet(value="",initParams={@WebInitParam(name="uploadPath",value="photos"),@WebInitParam(name="filePath",value="files"),@WebInitParam(name="adminPhotoPath",value="adminHeads")},loadOnStartup=1)
-@WebServlet(value="",loadOnStartup=1)
-public class InitController extends HttpServlet{
-	private static final long serialVersionUID = 2069037483125273141L;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
+//@Component //被spring容器管理
+//@PropertySource("classpath:application.properties")
+//@ConfigurationProperties(prefix = "uploadload")
+//@Order(1) //如果多个自定义ApplicationRunner，用来标明执行顺序
+public class InitController implements ApplicationRunner{
 	private String filePath ="files";
 	private String photoPath = "photos";
 	private String adminPhotoPath = "adminHeads";
-	
 
 	@Override
-	public void init(ServletConfig config) throws ServletException {
-		String temp = config.getServletContext().getInitParameter("uploadPath");
+	public void run(ApplicationArguments args) throws Exception {
+		System.out.println("==================");
+		System.out.println(args.getNonOptionArgs());
+		/*String temp = config.getServletContext().getInitParameter("uploadPath");
 		if (temp != null) { // 说明用户指定了上传路径
 			photoPath= temp;
 		}
@@ -52,6 +62,6 @@ public class InitController extends HttpServlet{
 		fl = new File(path,"../"+adminPhotoPath);
 		if (!fl.exists()) {
 			fl.mkdirs();
-		}
+		}*/
 	}
 }
