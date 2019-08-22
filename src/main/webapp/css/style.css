@@ -6,12 +6,41 @@
 	border-radius: 2px;
 }
 
+.myipt180 {
+	width: 180px;
+	height: 20px;
+	border: 1px solid #95B8E7;
+	border-radius: 2px;
+}
+
+.myipt120 {
+	width: 180px;
+	height: 20px;
+	border: 1px solid #95B8E7;
+	border-radius: 2px;
+}
+
+.myselect100 {
+	width: 100px;
+	height: 24px;
+	border: 1px solid #95B8E7;
+	border-radius: 2px;
+}
+
 .myselect {
 	width: 120px;
 	height: 24px;
 	border: 1px solid #95B8E7;
 	border-radius: 2px;
 }
+
+.myselect180 {
+	width: 160px;
+	height: 24px;
+	border: 1px solid #95B8E7;
+	border-radius: 2px;
+}
+
 
 .mylabel {
 	padding-left: 10px;

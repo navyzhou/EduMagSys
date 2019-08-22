@@ -57,11 +57,7 @@ function userLogin(){
 		data = parseInt($.trim(data));
 		if (data ==1) {
 			$("#myform")[0].reset();
-			if (rname == "学员"){
-				//location.href="front/index.jsp";
-			} else {
-				location.href="back/index.jsp";
-			}
+			location.href="back/index.jsp";
 		} else {
 			$("#waring-info").text("账号或密码错误，请确认后重新登录...");
 		}
